@@ -317,7 +317,7 @@ class DashboardScreen extends ConsumerWidget {
                 final signOutUseCase = ref.read(dashboardSignOutUseCaseProvider);
                 await signOutUseCase.execute();
                 if (context.mounted) {
-                  context.go('/');
+                  context.go('/login');
                 }
               } catch (e) {
                 if (context.mounted) {
