@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:go_router/go_router.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
-import 'package:fin_tracker/shared/utils/widgets/fin_tracker_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,9 +18,6 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   late final StreamSubscription<LoginEffect> _effectSubscription;
-  late final TextEditingController _emailController = TextEditingController();
-  late final TextEditingController _passwordController =
-      TextEditingController();
 
   @override
   void initState() {
@@ -41,7 +37,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(loginViewModelProvider);
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppColors.lightGrey,
@@ -53,82 +48,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 24),
-                  // Email Field
-                  FinTrackerTextFormField(
-                    controller: _emailController,
-                    hintText: "Enter your email address",
-                    obscureTextValue: false,
-                    textInputType: TextInputType.text,
-                  ),
-                  const SizedBox(height: 24),
-                  FinTrackerTextFormField(
-                    controller: _passwordController,
-                    hintText: "Enter your password",
-                    obscureTextValue: true,
-                    textInputType: TextInputType.visiblePassword,
-                  ),
-                  const SizedBox(height: 24),
-                  // Login Button or Loading
-                  state.maybeWhen(
-                    loading: () => Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.green, AppColors.darkGreen],
+                  // Google Sign In Button
+                  Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.lightGrey),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.green.withOpacity(0.3),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.white,
-                          strokeWidth: 3,
-                        ),
-                      ),
+                      ],
                     ),
-                    orElse: () => Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.green, AppColors.darkGreen],
-                        ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.green.withOpacity(0.3),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () => {
+                        onTap: state.maybeWhen(
+                          loading: () => null, // Disable button when loading
+                          orElse: () => () {
                             ref
                                 .read(loginViewModelProvider.notifier)
-                                .onEvent(
-                                  ValidateValues(
-                                    email: _emailController.text,
-                                    password: _passwordController.text,
-                                  ),
-                                ),
+                                .onEvent(GoogleSignInEvent());
                           },
-                          child: const Center(
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                color: AppColors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Sign in with Google",
+                            style: TextStyle(
+                              color: AppColors.deepGreen,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),

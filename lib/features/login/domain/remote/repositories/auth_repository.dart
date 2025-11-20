@@ -1,3 +1,5 @@
+
+
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// Represents the contract for authentication-related data operations.

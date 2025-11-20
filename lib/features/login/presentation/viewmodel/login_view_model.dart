@@ -1,25 +1,21 @@
 import 'dart:async';
 
+import 'package:fin_tracker/features/login/domain/usecases/auth_usecases.dart';
 import 'package:fin_tracker/features/login/presentation/event/login_events.dart';
-import 'package:fin_tracker/features/login/presentation/state/log_in_validation.dart';
-import 'package:fin_tracker/shared/utils/validation_messages.dart';
 import 'package:riverpod/riverpod.dart';
-import '../../domain/usecases/login_data_usecase.dart';
-import '../state/login_credentials/login_credentials.dart';
 import '../state/login_state/login_effect.dart';
 import '../state/login_state/login_state.dart';
 
 /// Manages the state and business logic for the login feature.
 ///
-/// This ViewModel is responsible for handling user interactions,
-/// validating input, and communicating with the [LoginDataUseCase]
-/// to perform login operations. It exposes a [Stream] of [LoginEffect]
+/// This ViewModel is responsible for handling Google Sign In authentication
+/// using the provided use case. It exposes a [Stream] of [LoginEffect]
 /// to notify the UI about side effects like navigation or showing messages.
 /// It also holds the current [LoginState] which represents the UI state
 /// (initial, loading, error, etc.).
 class LoginViewModel extends StateNotifier<LoginState> {
-  /// Use case for handling login data operations.
-  final LoginDataUseCase loginDataUseCase;
+  /// Use case for handling Google Sign In authentication.
+  final GoogleSignInUseCase googleSignInUseCase;
 
   /// Stream controller for emitting side effects to the UI.
   final _effectController = StreamController<LoginEffect>.broadcast();
@@ -27,14 +23,11 @@ class LoginViewModel extends StateNotifier<LoginState> {
   /// Exposes the stream of side effects.
   Stream<LoginEffect> get effectStream => _effectController.stream;
 
-  /// Holds the current login credentials entered by the user.
-  LoginCredentials loginCredentials = LoginCredentials();
-
   /// Creates an instance of [LoginViewModel].
   ///
-  /// Takes a [LoginDataUseCase] to interact with the domain layer.
+  /// Requires a [GoogleSignInUseCase] to be provided for dependency injection.
   /// Initializes the state to [LoginState.initial].
-  LoginViewModel(this.loginDataUseCase) : super(const LoginState.initial());
+  LoginViewModel(this.googleSignInUseCase) : super(const LoginState.initial());
 
   /// Handles incoming [LoginEvent]s from the UI.
   ///
@@ -47,34 +40,28 @@ class LoginViewModel extends StateNotifier<LoginState> {
         _effectController.add(ShowBottomSheetEffect());
         break;
 
-      /// When a [ValidateValues] event is received, it triggers the
-      /// [_validateCredentials] method.
-      case ValidateValues():
-        _validateCredentials(event.email, event.password);
+      /// When a [GoogleSignInEvent] event is received, it triggers the
+      /// [_signInWithGoogle] method.
+      case GoogleSignInEvent():
+        _signInWithGoogle();
     }
   }
 
-  /// Validates the provided [email] and [password].
+  /// Signs in the user with Google using the provided use case.
   ///
-  /// Sets the state to [LoginState.loading] before making the validation call.
-  /// If validation is successful (both email and password are valid),
-  /// it emits a [NavigateToDashBoard] effect.
-  /// If validation fails, it updates the state to [LoginState.error] with
-  /// the specific validation errors.
-  /// If any other exception occurs, it sets the state to [LoginState.miscError].
-  void _validateCredentials(String email, String password) async {
+  /// Sets the state to [LoginState.loading] before initiating the sign in process.
+  /// If sign in is successful, it emits a [NavigateToDashBoard] effect.
+  /// If sign in fails, it sets the state to [LoginState.miscError] with an error message.
+  void _signInWithGoogle() async {
     state = const LoginState.loading();
     try {
-      final result = loginDataUseCase.validateCredentials(email, password);
+      // Execute the Google Sign In use case
+      await googleSignInUseCase.execute();
 
-      if (result.passwordValidation is ValidPasswordValidation &&
-          result.emailValidation is ValidEmailValidation) {
-        _effectController.add(NavigateToDashBoard());
-      } else {
-        state = LoginState.error(validationErrors: result);
-      }
+      // If successful, navigate to dashboard
+      _effectController.add(NavigateToDashBoard());
     } catch (e) {
-      state = LoginState.miscError(ValidationMessages.somethingWentWrong);
+      state = LoginState.miscError('Google Sign In failed: ${e.toString()}');
     }
   }
 

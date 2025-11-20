@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../domain/remote/repositories/login_repository.dart';
+import '../../../domain/remote/repositories/auth_repository.dart';
 
 /// Implementation of the [AuthRepository] interface using Firebase Auth.
 ///
@@ -25,7 +25,9 @@ class AuthRepositoryImpl implements AuthRepository {
       googleProvider.addScope('profile');
 
       // Sign in with Firebase Auth using Google Provider
-      final userCredential = await _firebaseAuth.signInWithProvider(googleProvider);
+      final userCredential = await _firebaseAuth.signInWithProvider(
+        googleProvider,
+      );
 
       return userCredential;
     } catch (e) {
