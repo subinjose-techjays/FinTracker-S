@@ -61,3 +61,18 @@ final loginViewModelProvider =
 final loginEffectProvider = StreamProvider<LoginEffect?>((ref) {
   return ref.watch(loginViewModelProvider.notifier).effectStream;
 });
+
+/// Provides the current authenticated user from Firebase Auth.
+///
+/// This provider listens to authentication state changes and provides
+/// the current user information for display in the dashboard.
+final currentUserProvider = StreamProvider<User?>((ref) {
+  final firebaseAuth = ref.watch(firebaseAuthProvider);
+  return firebaseAuth.authStateChanges();
+});
+
+/// Provides the sign out use case for dashboard functionality.
+final dashboardSignOutUseCaseProvider = Provider<SignOutUseCase>((ref) {
+  final authRepository = ref.watch(authRepositoryProvider);
+  return SignOutUseCase(authRepository);
+});
