@@ -77,6 +77,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 child: const Text('Download Gemma 2B Model'),
               ),
               const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () {
+                  ref
+                      .read(chatViewModelProvider.notifier)
+                      .onEvent(PickModelFileEvent());
+                },
+                child: const Text('Pick Model from Files'),
+              ),
+              const SizedBox(height: 16),
               const Text(
                 '~500MB download required\n⚠️ Requires physical iOS device\n(Not compatible with simulators)',
                 style: TextStyle(fontSize: 12, color: Colors.grey),

@@ -8,3 +8,5 @@ class SendMessageEvent extends ChatEvent {
 }
 
 class CheckModelStatusEvent extends ChatEvent {}
+
+class PickModelFileEvent extends ChatEvent {}

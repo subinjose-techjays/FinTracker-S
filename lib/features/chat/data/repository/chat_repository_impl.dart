@@ -5,12 +5,10 @@ import 'package:tar/tar.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import '../../domain/repository/chat_repository.dart';
 
-/**
- * Chat Repository Implementation with Gemma AI Model
- *
- * Uses flutter_gemma (wrapping MediaPipe) for intelligent financial conversations.
- * Requires Flutter Master channel and physical iOS device for optimal performance.
- */
+/// Chat Repository Implementation with Gemma AI Model
+///
+/// Uses flutter_gemma (wrapping MediaPipe) for intelligent financial conversations.
+/// Requires Flutter Master channel and physical iOS device for optimal performance.
 
 class ChatRepositoryImpl implements ChatRepository {
   InferenceChat? _chat;
@@ -103,6 +101,20 @@ class ChatRepositoryImpl implements ChatRepository {
 
     // 4. Initialize after download
     await initialize();
+  }
+
+  @override
+  Future<void> loadModelFromFile(String path) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final targetFile = File('${dir.path}/$_modelFileName');
+    final sourceFile = File(path);
+
+    if (await sourceFile.exists()) {
+      await sourceFile.copy(targetFile.path);
+      await initialize();
+    } else {
+      throw Exception('Selected file does not exist.');
+    }
   }
 
   @override

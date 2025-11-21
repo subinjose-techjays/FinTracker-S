@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../domain/repository/chat_repository.dart';
 import '../../data/repository/chat_repository_impl.dart';
 import '../state/chat_state.dart';
@@ -34,6 +35,9 @@ class ChatViewModel extends StateNotifier<ChatState> {
         break;
       case DownloadModelEvent():
         _downloadModel();
+        break;
+      case PickModelFileEvent():
+        _pickModelFile();
         break;
       case SendMessageEvent(message: final msg):
         _sendMessage(msg);
@@ -72,6 +76,23 @@ class ChatViewModel extends StateNotifier<ChatState> {
       state = ChatState.error("Download failed: ${e.toString()}");
       _effectController.add(
         ShowErrorEffect("Download failed: ${e.toString()}"),
+      );
+    }
+  }
+
+  Future<void> _pickModelFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(type: FileType.any);
+
+      if (result != null && result.files.single.path != null) {
+        state = const ChatState.downloading(0); // Show loading state
+        await _repository.loadModelFromFile(result.files.single.path!);
+        state = const ChatState.ready([]);
+      }
+    } catch (e) {
+      state = ChatState.error("Failed to load model: ${e.toString()}");
+      _effectController.add(
+        ShowErrorEffect("Failed to load model: ${e.toString()}"),
       );
     }
   }
