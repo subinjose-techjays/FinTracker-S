@@ -1,8 +1,6 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+sealed class ChatEffect {}
 
-part 'chat_effect.freezed.dart';
-
-@freezed
-abstract class ChatEffect with _$ChatEffect {
-  const factory ChatEffect.showError(String message) = ShowErrorEffect;
+class ShowErrorEffect extends ChatEffect {
+  final String message;
+  ShowErrorEffect(this.message);
 }

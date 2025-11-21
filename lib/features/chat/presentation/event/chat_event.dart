@@ -1,11 +1,12 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+sealed class ChatEvent {}
 
-part 'chat_event.freezed.dart';
+class DownloadModelEvent extends ChatEvent {}
 
-@freezed
-class ChatEvent with _$ChatEvent {
-  const factory ChatEvent.downloadModel() = DownloadModelEvent;
-  const factory ChatEvent.sendMessage(String message) = SendMessageEvent;
-  const factory ChatEvent.checkModelStatus() = CheckModelStatusEvent;
-  const factory ChatEvent.pickModelFile() = PickModelFileEvent;
+class SendMessageEvent extends ChatEvent {
+  final String message;
+  SendMessageEvent(this.message);
 }
+
+class CheckModelStatusEvent extends ChatEvent {}
+
+class PickModelFileEvent extends ChatEvent {}

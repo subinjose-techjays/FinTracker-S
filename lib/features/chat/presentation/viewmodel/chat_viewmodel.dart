@@ -25,16 +25,24 @@ class ChatViewModel extends StateNotifier<ChatState> {
   Stream<ChatEffect> get effectStream => _effectController.stream;
 
   ChatViewModel(this._repository) : super(const ChatState.initial()) {
-    onEvent(const ChatEvent.checkModelStatus());
+    onEvent(CheckModelStatusEvent());
   }
 
   void onEvent(ChatEvent event) {
-    event.map(
-      checkModelStatus: (_) => _checkModelStatus(),
-      downloadModel: (_) => _downloadModel(),
-      pickModelFile: (_) => _pickModelFile(),
-      sendMessage: (e) => _sendMessage(e.message),
-    );
+    switch (event) {
+      case CheckModelStatusEvent():
+        _checkModelStatus();
+        break;
+      case DownloadModelEvent():
+        _downloadModel();
+        break;
+      case PickModelFileEvent():
+        _pickModelFile();
+        break;
+      case SendMessageEvent(message: final msg):
+        _sendMessage(msg);
+        break;
+    }
   }
 
   Future<void> _checkModelStatus() async {
@@ -48,7 +56,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
       }
     } catch (e) {
       state = ChatState.error(e.toString());
-      _effectController.add(ChatEffect.showError(e.toString()));
+      _effectController.add(ShowErrorEffect(e.toString()));
     }
   }
 
@@ -67,7 +75,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
     } catch (e) {
       state = ChatState.error("Download failed: ${e.toString()}");
       _effectController.add(
-        ChatEffect.showError("Download failed: ${e.toString()}"),
+        ShowErrorEffect("Download failed: ${e.toString()}"),
       );
     }
   }
@@ -84,7 +92,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
     } catch (e) {
       state = ChatState.error("Failed to load model: ${e.toString()}");
       _effectController.add(
-        ChatEffect.showError("Failed to load model: ${e.toString()}"),
+        ShowErrorEffect("Failed to load model: ${e.toString()}"),
       );
     }
   }
@@ -129,7 +137,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
       }
     } catch (e) {
       state = ChatState.error(e.toString());
-      _effectController.add(ChatEffect.showError(e.toString()));
+      _effectController.add(ShowErrorEffect(e.toString()));
     }
   }
 
