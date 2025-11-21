@@ -25,14 +25,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final notifier = ref.read(chatViewModelProvider.notifier);
     _effectSubscription = notifier.effectStream.listen((effect) {
       if (mounted) {
-        if (effect is ShowErrorEffect) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(effect.message),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        effect.when(
+          showError: (message) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(message), backgroundColor: Colors.red),
+            );
+          },
+        );
       }
     });
   }
@@ -72,7 +71,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 onPressed: () {
                   ref
                       .read(chatViewModelProvider.notifier)
-                      .onEvent(DownloadModelEvent());
+                      .onEvent(const ChatEvent.downloadModel());
                 },
                 child: const Text('Download Gemma 2B Model'),
               ),
@@ -81,7 +80,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 onPressed: () {
                   ref
                       .read(chatViewModelProvider.notifier)
-                      .onEvent(PickModelFileEvent());
+                      .onEvent(const ChatEvent.pickModelFile());
                 },
                 child: const Text('Pick Model from Files'),
               ),
@@ -168,7 +167,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           if (value.isNotEmpty) {
                             ref
                                 .read(chatViewModelProvider.notifier)
-                                .onEvent(SendMessageEvent(value));
+                                .onEvent(ChatEvent.sendMessage(value));
                             _controller.clear();
                           }
                         },
@@ -180,7 +179,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         if (_controller.text.isNotEmpty) {
                           ref
                               .read(chatViewModelProvider.notifier)
-                              .onEvent(SendMessageEvent(_controller.text));
+                              .onEvent(ChatEvent.sendMessage(_controller.text));
                           _controller.clear();
                         }
                       },

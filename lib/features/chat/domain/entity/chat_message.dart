@@ -1,11 +1,12 @@
-class ChatMessage {
-  final String text;
-  final bool isUser;
-  final DateTime timestamp;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const ChatMessage({
-    required this.text,
-    required this.isUser,
-    required this.timestamp,
-  });
+part 'chat_message.freezed.dart';
+
+@freezed
+abstract class ChatMessage with _$ChatMessage {
+  const factory ChatMessage({
+    required String text,
+    required bool isUser,
+    required DateTime timestamp,
+  }) = _ChatMessage;
 }
