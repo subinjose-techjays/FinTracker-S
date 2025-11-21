@@ -18,27 +18,24 @@ class DashboardScreen extends ConsumerWidget {
         backgroundColor: AppColors.deepGreen,
         title: const Text(
           'FinTracker Dashboard',
-          style: TextStyle(
-            color: AppColors.white,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w600),
         ),
         actions: [
           IconButton(
             onPressed: () => _showSignOutDialog(context, ref),
-            icon: const Icon(
-              Icons.logout,
-              color: AppColors.white,
-            ),
+            icon: const Icon(Icons.logout, color: AppColors.white),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/chat'),
+        backgroundColor: AppColors.deepGreen,
+        child: const Icon(Icons.chat, color: AppColors.white),
       ),
       body: userAsyncValue.when(
         data: (user) {
           if (user == null) {
-            return const Center(
-              child: Text('No user logged in'),
-            );
+            return const Center(child: Text('No user logged in'));
           }
           return _buildUserProfile(context, user);
         },
@@ -47,9 +44,8 @@ class DashboardScreen extends ConsumerWidget {
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.deepGreen),
           ),
         ),
-        error: (error, stack) => Center(
-          child: Text('Error loading user: $error'),
-        ),
+        error: (error, stack) =>
+            Center(child: Text('Error loading user: $error')),
       ),
     );
   }
@@ -134,19 +130,11 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           // User Details Cards
-          _buildInfoCard(
-            'Email',
-            user.email ?? 'Not provided',
-            Icons.email,
-          ),
+          _buildInfoCard('Email', user.email ?? 'Not provided', Icons.email),
 
           const SizedBox(height: 12),
 
-          _buildInfoCard(
-            'User ID',
-            user.uid,
-            Icons.account_circle,
-          ),
+          _buildInfoCard('User ID', user.uid, Icons.account_circle),
 
           const SizedBox(height: 12),
 
@@ -229,7 +217,12 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoCard(String title, String value, IconData icon, {Color? iconColor}) {
+  Widget _buildInfoCard(
+    String title,
+    String value,
+    IconData icon, {
+    Color? iconColor,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -246,11 +239,7 @@ class DashboardScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: iconColor ?? AppColors.deepGreen,
-            size: 24,
-          ),
+          Icon(icon, color: iconColor ?? AppColors.deepGreen, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -314,7 +303,9 @@ class DashboardScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.of(context).pop();
               try {
-                final signOutUseCase = ref.read(dashboardSignOutUseCaseProvider);
+                final signOutUseCase = ref.read(
+                  dashboardSignOutUseCaseProvider,
+                );
                 await signOutUseCase.execute();
                 if (context.mounted) {
                   context.go('/login');
@@ -332,10 +323,7 @@ class DashboardScreen extends ConsumerWidget {
             },
             child: const Text(
               'Sign Out',
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),
         ],

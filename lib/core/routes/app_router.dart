@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fin_tracker/features/login/presentation/screen/login_screen.dart';
 import 'package:fin_tracker/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:fin_tracker/features/chat/presentation/ui/chat_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -24,10 +25,7 @@ final appRouter = GoRouter(
     return null;
   },
   routes: [
-    GoRoute(
-      path: '/',
-      redirect: (context, state) => '/login',
-    ),
+    GoRoute(path: '/', redirect: (context, state) => '/login'),
     GoRoute(
       path: '/login',
       name: 'login',
@@ -37,6 +35,11 @@ final appRouter = GoRouter(
       path: '/dashboard',
       name: 'dashboard',
       builder: (context, state) => const DashboardScreen(),
+    ),
+    GoRoute(
+      path: '/chat',
+      name: 'chat',
+      builder: (context, state) => const ChatScreen(),
     ),
   ],
 );

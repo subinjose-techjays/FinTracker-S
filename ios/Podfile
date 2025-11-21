@@ -1,8 +1,12 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '15.0'
+platform :ios, '16.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+# MediaPipe requires specific iOS configurations
+ENV['MEDIAPAPE_DISABLE_GPU'] = '1'  # Disable GPU acceleration for compatibility
+ENV['MEDIAPAPE_DISABLE_OPENCV'] = '1'  # Disable OpenCV for compatibility
 
 project 'Runner', {
   'Debug' => :debug,
@@ -28,7 +32,7 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 target 'Runner' do
-  use_frameworks!
+  use_frameworks! :linkage => :static
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
@@ -39,5 +43,27 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    # MediaPipe specific configurations
+    if target.name.include?('mediapipe') || target.name.include?('genai')
+      target.build_configurations.each do |config|
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'MEDIAPIPE_DISABLE_GPU=1'
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'MEDIAPIPE_DISABLE_OPENCV=1'
+        config.build_settings['OTHER_LDFLAGS'] ||= ['$(inherited)']
+        config.build_settings['OTHER_LDFLAGS'] << '-framework'
+        config.build_settings['OTHER_LDFLAGS'] << 'Accelerate'
+        config.build_settings['OTHER_LDFLAGS'] << '-framework'
+        config.build_settings['OTHER_LDFLAGS'] << 'CoreVideo'
+        config.build_settings['OTHER_LDFLAGS'] << '-framework'
+        config.build_settings['OTHER_LDFLAGS'] << 'AVFoundation'
+        config.build_settings['OTHER_LDFLAGS'] << '-framework'
+        config.build_settings['OTHER_LDFLAGS'] << 'CoreMedia'
+        # Enable bitcode for MediaPipe compatibility
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
+        # Set minimum iOS version for MediaPipe
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+      end
+    end
   end
 end
