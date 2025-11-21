@@ -2,15 +2,11 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../domain/repository/chat_repository.dart';
-import '../../data/repository/chat_repository_impl.dart';
+import '../../di/chat_provider.dart';
 import '../state/chat_state.dart';
 import '../state/chat_effect.dart';
 import '../event/chat_event.dart';
 import '../../domain/entity/chat_message.dart';
-
-final chatRepositoryProvider = Provider<ChatRepository>(
-  (ref) => ChatRepositoryImpl(),
-);
 
 final chatViewModelProvider = StateNotifierProvider<ChatViewModel, ChatState>((
   ref,
