@@ -49,7 +49,9 @@ class ChatRepositoryImpl implements ChatRepository {
           modelType: ModelType.gemmaIt,
         ).fromFile(modelPath).install();
 
-        final model = await FlutterGemma.getActiveModel(maxTokens: 512);
+import '../../../../core/constants/app_constants.dart';
+
+        final model = await FlutterGemma.getActiveModel(maxTokens: AppConstants.gemmaMaxTokens);
         _chat = await model.createChat();
 
         print('Gemma model initialized successfully at $modelPath');
