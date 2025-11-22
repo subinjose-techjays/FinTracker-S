@@ -62,7 +62,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withOpacity(AppDimens.opacity10),
                         blurRadius: AppDimens.blurRadius20,
                         offset: const Offset(0, AppDimens.offsetY8),
                       ),
@@ -94,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   'Your Personal Finance Companion',
                   style: TextStyle(
                     fontSize: AppDimens.fontSize16,
-                    color: AppColors.deepGreen.withOpacity(0.7),
+                    color: AppColors.deepGreen.withOpacity(AppDimens.opacity70),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -109,7 +109,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     borderRadius: BorderRadius.circular(AppDimens.radius16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withOpacity(AppDimens.opacity10),
                         blurRadius: AppDimens.blurRadius10,
                         offset: const Offset(0, AppDimens.offsetY4),
                       ),
@@ -131,7 +131,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: AppDimens.fontSize14,
-                          color: AppColors.deepGreen.withOpacity(0.7),
+                          color: AppColors.deepGreen.withOpacity(
+                            AppDimens.opacity70,
+                          ),
                           height: 1.5,
                         ),
                       ),
@@ -151,7 +153,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     border: Border.all(color: AppColors.lightGrey, width: 1),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withOpacity(AppDimens.opacity10),
                         blurRadius: AppDimens.blurRadius12,
                         offset: const Offset(0, AppDimens.offsetY6),
                       ),
@@ -181,7 +183,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               width: AppDimens.googleLogoSize,
                               height: AppDimens.googleLogoSize,
                               decoration: BoxDecoration(
-                                color: AppColors.deepGreen.withOpacity(0.1),
+                                color: AppColors.deepGreen.withOpacity(
+                                  AppDimens.opacity10,
+                                ),
                                 borderRadius: BorderRadius.circular(
                                   AppDimens.radius4,
                                 ),
@@ -228,7 +232,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: AppDimens.fontSize12,
-                    color: AppColors.deepGreen.withOpacity(0.5),
+                    color: AppColors.deepGreen.withOpacity(AppDimens.opacity50),
                   ),
                 ),
 
@@ -239,9 +243,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   miscError: (errorMessage) => Container(
                     padding: const EdgeInsets.all(AppDimens.spacing16),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withOpacity(AppDimens.opacity10),
                       borderRadius: BorderRadius.circular(AppDimens.radius12),
-                      border: Border.all(color: Colors.red.withOpacity(0.3)),
+                      border: Border.all(
+                        color: Colors.red.withOpacity(AppDimens.opacity30),
+                      ),
                     ),
                     child: Row(
                       children: [

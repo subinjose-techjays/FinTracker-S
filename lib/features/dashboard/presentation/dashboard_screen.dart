@@ -67,7 +67,7 @@ class DashboardScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(AppDimens.radius16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withOpacity(AppDimens.opacity10),
                   blurRadius: AppDimens.blurRadius10,
                   offset: const Offset(0, AppDimens.offsetY4),
                 ),
@@ -110,7 +110,7 @@ class DashboardScreen extends ConsumerWidget {
                   'Financial Tracker',
                   style: TextStyle(
                     fontSize: AppDimens.fontSize16,
-                    color: AppColors.deepGreen.withOpacity(0.7),
+                    color: AppColors.deepGreen.withOpacity(AppDimens.opacity70),
                   ),
                 ),
               ],
@@ -184,7 +184,7 @@ class DashboardScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(AppDimens.radius12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withOpacity(AppDimens.opacity10),
                     blurRadius: AppDimens.blurRadius8,
                     offset: const Offset(0, AppDimens.offsetY2),
                   ),
@@ -255,7 +255,7 @@ class DashboardScreen extends ConsumerWidget {
                   title,
                   style: TextStyle(
                     fontSize: AppDimens.fontSize14,
-                    color: AppColors.deepGreen.withOpacity(0.7),
+                    color: AppColors.deepGreen.withOpacity(AppDimens.opacity70),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -302,7 +302,9 @@ class DashboardScreen extends ConsumerWidget {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.deepGreen.withOpacity(0.7)),
+              style: TextStyle(
+                color: AppColors.deepGreen.withOpacity(AppDimens.opacity70),
+              ),
             ),
           ),
           TextButton(
