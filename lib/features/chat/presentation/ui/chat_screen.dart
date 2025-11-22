@@ -10,6 +10,7 @@ import '../event/chat_event.dart';
 import '../widgets/chat_input_area.dart';
 import '../widgets/chat_message_item.dart';
 import '../widgets/chat_model_views.dart';
+import '../widgets/typing_indicator.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -106,9 +107,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         Expanded(
           child: ListView.builder(
             controller: _scrollController,
-            itemCount: state.messages.length,
+            itemCount: state.messages.length + (state.isGenerating ? 1 : 0),
             padding: const EdgeInsets.all(AppDimens.spacing16),
             itemBuilder: (context, index) {
+              if (index == state.messages.length) {
+                return const Align(
+                  alignment: Alignment.centerLeft,
+                  child: TypingIndicator(),
+                );
+              }
               return ChatMessageItem(message: state.messages[index]);
             },
           ),

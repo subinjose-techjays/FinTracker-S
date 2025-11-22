@@ -123,32 +123,51 @@ class ChatViewModel extends StateNotifier<ChatState> {
       String fullResponse = "";
 
       // Add placeholder bot message
-      state = state.copyWith(
-        messages: [
-          ...currentMessages,
-          userMessage,
-          ChatMessage(
-            text: AppStrings.botPlaceholder,
-            isUser: false,
-            timestamp: DateTime.now(),
-          ),
-        ],
-      );
-
+      // state = state.copyWith(
+      //   messages: [
+      //     ...currentMessages,
+      //     userMessage,
+      //     ChatMessage(
+      //       text: AppStrings.botPlaceholder,
+      //       isUser: false,
+      //       timestamp: DateTime.now(),
+      //     ),
+      //   ],
       _responseSubscription?.cancel();
       _responseSubscription = responseStream.listen(
         (chunk) {
           fullResponse += chunk;
           // Update the last message with new content
-          final updatedMessages = List<ChatMessage>.from(currentMessages)
-            ..add(userMessage)
-            ..add(
-              ChatMessage(
-                text: fullResponse,
-                isUser: false,
-                timestamp: DateTime.now(),
-              ),
-            );
+          // If it's the first chunk, add a new message. Otherwise update the last one.
+          // Since we removed the placeholder, we need to handle the first chunk differently.
+
+          List<ChatMessage> updatedMessages;
+          if (fullResponse.length == chunk.length) {
+            updatedMessages = List<ChatMessage>.from(currentMessages)
+              ..add(userMessage)
+              ..add(
+                ChatMessage(
+                  text: fullResponse,
+                  isUser: false,
+                  timestamp: DateTime.now(),
+                ),
+              );
+          } else {
+            updatedMessages = List<ChatMessage>.from(currentMessages)
+              ..add(userMessage)
+              ..add(
+                ChatMessage(
+                  text: fullResponse,
+                  isUser: false,
+                  timestamp: DateTime.now(),
+                ),
+              );
+            // Actually, since we are rebuilding the list from currentMessages + userMessage + botMessage every time,
+            // the logic is the same. We just need to make sure we don't duplicate the bot message if we were appending.
+            // But here we are reconstructing the whole list ending with the bot message.
+            // So the previous logic works fine, it just replaces the "placeholder" (which we didn't add to state) with the real message.
+          }
+
           state = state.copyWith(messages: updatedMessages);
         },
         onDone: () {

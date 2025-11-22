@@ -38,8 +38,17 @@ class ChatInputArea extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: Icon(isGenerating ? Icons.stop : Icons.send),
-            color: isGenerating ? Colors.red : null,
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+              child: Icon(
+                isGenerating ? Icons.stop : Icons.send,
+                key: ValueKey<bool>(isGenerating),
+                color: isGenerating ? Colors.red : null,
+              ),
+            ),
             onPressed: () {
               if (isGenerating) {
                 onStop();
