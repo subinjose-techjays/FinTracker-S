@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fin_tracker/features/login/presentation/state/login_state/login_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
+import 'package:fin_tracker/core/theme/app_dimens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -44,71 +45,73 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimens.spacing24,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 60),
+                const SizedBox(height: AppDimens.spacing60),
 
                 // Logo/App Icon Section
                 Container(
-                  width: 120,
-                  height: 120,
+                  width: AppDimens.logoSize,
+                  height: AppDimens.logoSize,
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+                        blurRadius: AppDimens.blurRadius20,
+                        offset: const Offset(0, AppDimens.offsetY8),
                       ),
                     ],
                   ),
                   child: const Icon(
                     Icons.account_balance_wallet,
-                    size: 60,
+                    size: AppDimens.iconSize60,
                     color: AppColors.deepGreen,
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimens.spacing32),
 
                 // App Title
                 const Text(
                   'FinTracker',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: AppDimens.fontSize32,
                     fontWeight: FontWeight.bold,
                     color: AppColors.deepGreen,
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimens.spacing8),
 
                 // Subtitle
                 Text(
                   'Your Personal Finance Companion',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: AppDimens.fontSize16,
                     color: AppColors.deepGreen.withOpacity(0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
 
-                const SizedBox(height: 48),
+                const SizedBox(height: AppDimens.spacing48),
 
                 // Welcome Message
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(AppDimens.spacing24),
                   decoration: BoxDecoration(
                     color: AppColors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppDimens.radius16),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                        blurRadius: AppDimens.blurRadius10,
+                        offset: const Offset(0, AppDimens.offsetY4),
                       ),
                     ],
                   ),
@@ -117,17 +120,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Text(
                         'Welcome Back!',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: AppDimens.fontSize24,
                           fontWeight: FontWeight.bold,
                           color: AppColors.deepGreen,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimens.spacing8),
                       Text(
                         'Sign in with your Google account to access your financial dashboard and track your expenses.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: AppDimens.fontSize14,
                           color: AppColors.deepGreen.withOpacity(0.7),
                           height: 1.5,
                         ),
@@ -136,28 +139,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimens.spacing32),
 
                 // Google Sign In Button
                 Container(
                   width: double.infinity,
-                  height: 60,
+                  height: AppDimens.buttonHeight,
                   decoration: BoxDecoration(
                     color: AppColors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppDimens.radius16),
                     border: Border.all(color: AppColors.lightGrey, width: 1),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
+                        blurRadius: AppDimens.blurRadius12,
+                        offset: const Offset(0, AppDimens.offsetY6),
                       ),
                     ],
                   ),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppDimens.radius16),
                       onTap: state.maybeWhen(
                         loading: () => null, // Disable button when loading
                         orElse: () => () {
@@ -167,29 +170,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         },
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimens.spacing20,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             // Google Logo Placeholder (you can replace with actual Google logo)
                             Container(
-                              width: 24,
-                              height: 24,
+                              width: AppDimens.googleLogoSize,
+                              height: AppDimens.googleLogoSize,
                               decoration: BoxDecoration(
                                 color: AppColors.deepGreen.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimens.radius4,
+                                ),
                               ),
                               child: const Icon(
                                 Icons.g_mobiledata,
-                                size: 20,
+                                size: AppDimens.iconSize20,
                                 color: AppColors.deepGreen,
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: AppDimens.spacing12),
                             state.maybeWhen(
                               loading: () => const SizedBox(
-                                width: 20,
-                                height: 20,
+                                width: AppDimens.iconSize20,
+                                height: AppDimens.iconSize20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -201,7 +208,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 "Continue with Google",
                                 style: TextStyle(
                                   color: AppColors.deepGreen,
-                                  fontSize: 16,
+                                  fontSize: AppDimens.fontSize16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -213,27 +220,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimens.spacing24),
 
                 // Terms and Privacy
                 Text(
                   'By continuing, you agree to our Terms of Service and Privacy Policy',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppDimens.fontSize12,
                     color: AppColors.deepGreen.withOpacity(0.5),
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimens.spacing32),
 
                 // Error Message Display
                 state.maybeWhen(
                   miscError: (errorMessage) => Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppDimens.spacing16),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimens.radius12),
                       border: Border.all(color: Colors.red.withOpacity(0.3)),
                     ),
                     child: Row(
@@ -241,15 +248,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const Icon(
                           Icons.error_outline,
                           color: Colors.red,
-                          size: 20,
+                          size: AppDimens.iconSize20,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimens.spacing12),
                         Expanded(
                           child: Text(
                             errorMessage,
                             style: const TextStyle(
                               color: Colors.red,
-                              fontSize: 14,
+                              fontSize: AppDimens.fontSize14,
                             ),
                           ),
                         ),
@@ -259,7 +266,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   orElse: () => const SizedBox.shrink(),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimens.spacing24),
               ],
             ),
           ),
@@ -273,32 +280,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppDimens.spacing24),
         decoration: const BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppDimens.radius20),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40,
-              height: 4,
+              width: AppDimens.bottomSheetHandleWidth,
+              height: AppDimens.bottomSheetHandleHeight,
               decoration: BoxDecoration(
                 color: AppColors.oliveGreen,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppDimens.radius2),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimens.spacing20),
             const Text(
               "bottom_sheet_displayed",
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimens.fontSize16,
                 color: AppColors.deepGreen,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimens.spacing20),
           ],
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
+import 'package:fin_tracker/core/theme/app_dimens.dart';
 import 'package:fin_tracker/features/login/di/login_provider.dart';
 import 'package:fin_tracker/features/dashboard/di/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -53,22 +54,22 @@ class DashboardScreen extends ConsumerWidget {
 
   Widget _buildUserProfile(BuildContext context, User user) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimens.spacing16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Welcome Section
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppDimens.spacing24),
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimens.radius16),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  blurRadius: AppDimens.blurRadius10,
+                  offset: const Offset(0, AppDimens.offsetY4),
                 ),
               ],
             ),
@@ -77,7 +78,7 @@ class DashboardScreen extends ConsumerWidget {
               children: [
                 // Profile Picture
                 CircleAvatar(
-                  radius: 50,
+                  radius: AppDimens.radius50,
                   backgroundImage: user.photoURL != null
                       ? NetworkImage(user.photoURL!)
                       : null,
@@ -88,27 +89,27 @@ class DashboardScreen extends ConsumerWidget {
                               ? user.displayName![0].toUpperCase()
                               : user.email?[0].toUpperCase() ?? 'U',
                           style: const TextStyle(
-                            fontSize: 32,
+                            fontSize: AppDimens.fontSize32,
                             fontWeight: FontWeight.bold,
                             color: AppColors.white,
                           ),
                         )
                       : null,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimens.spacing16),
                 Text(
                   user.displayName ?? 'Welcome!',
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: AppDimens.fontSize24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.deepGreen,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimens.spacing8),
                 Text(
                   'Financial Tracker',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: AppDimens.fontSize16,
                     color: AppColors.deepGreen.withOpacity(0.7),
                   ),
                 ),
@@ -116,28 +117,28 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimens.spacing24),
 
           // Account Information Section
           const Text(
             'Account Information',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: AppDimens.fontSize20,
               fontWeight: FontWeight.bold,
               color: AppColors.deepGreen,
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimens.spacing16),
 
           // User Details Cards
           _buildInfoCard('Email', user.email ?? 'Not provided', Icons.email),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimens.spacing12),
 
           _buildInfoCard('User ID', user.uid, Icons.account_circle),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimens.spacing12),
 
           _buildInfoCard(
             'Email Verified',
@@ -146,7 +147,7 @@ class DashboardScreen extends ConsumerWidget {
             iconColor: user.emailVerified ? AppColors.deepGreen : Colors.orange,
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimens.spacing12),
 
           _buildInfoCard(
             'Account Created',
@@ -154,7 +155,7 @@ class DashboardScreen extends ConsumerWidget {
             Icons.calendar_today,
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimens.spacing12),
 
           _buildInfoCard(
             'Last Sign In',
@@ -162,30 +163,30 @@ class DashboardScreen extends ConsumerWidget {
             Icons.access_time,
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimens.spacing24),
 
           // Provider Information
           if (user.providerData.isNotEmpty) ...[
             const Text(
               'Authentication Provider',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: AppDimens.fontSize20,
                 fontWeight: FontWeight.bold,
                 color: AppColors.deepGreen,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimens.spacing16),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimens.spacing16),
               decoration: BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimens.radius12),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    blurRadius: AppDimens.blurRadius8,
+                    offset: const Offset(0, AppDimens.offsetY2),
                   ),
                 ],
               ),
@@ -194,16 +195,16 @@ class DashboardScreen extends ConsumerWidget {
                   const Icon(
                     Icons.account_balance,
                     color: AppColors.deepGreen,
-                    size: 24,
+                    size: AppDimens.iconSize24,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimens.spacing12),
                   Expanded(
                     child: Text(
                       user.providerData.first.providerId == 'google.com'
                           ? 'Google Account'
                           : user.providerData.first.providerId,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: AppDimens.fontSize16,
                         fontWeight: FontWeight.w500,
                         color: AppColors.deepGreen,
                       ),
@@ -226,22 +227,26 @@ class DashboardScreen extends ConsumerWidget {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimens.spacing16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimens.radius12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimens.blurRadius8,
+            offset: const Offset(0, AppDimens.offsetY2),
           ),
         ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: iconColor ?? AppColors.deepGreen, size: 24),
-          const SizedBox(width: 12),
+          Icon(
+            icon,
+            color: iconColor ?? AppColors.deepGreen,
+            size: AppDimens.iconSize24,
+          ),
+          const SizedBox(width: AppDimens.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,16 +254,16 @@ class DashboardScreen extends ConsumerWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: AppDimens.fontSize14,
                     color: AppColors.deepGreen.withOpacity(0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimens.spacing4),
                 Text(
                   value,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: AppDimens.fontSize16,
                     fontWeight: FontWeight.w500,
                     color: AppColors.deepGreen,
                   ),

@@ -32,9 +32,6 @@ class ChatRepositoryImpl implements ChatRepository {
           final docCacheFile = File('$modelPath.xnnpack_cache');
           if (await docCacheFile.exists()) {
             await docCacheFile.delete();
-            print(
-              'Deleted corrupted XNNPACK cache from Documents: ${docCacheFile.path}',
-            );
           }
 
           // Check in Cache directory (where logs indicate it is)
@@ -44,9 +41,6 @@ class ChatRepositoryImpl implements ChatRepository {
           );
           if (await tempCacheFile.exists()) {
             await tempCacheFile.delete();
-            print(
-              'Deleted corrupted XNNPACK cache from Temp: ${tempCacheFile.path}',
-            );
           }
         }
 

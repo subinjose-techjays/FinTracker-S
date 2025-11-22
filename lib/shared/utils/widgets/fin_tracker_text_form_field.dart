@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimens.dart';
 
 class FinTrackerTextFormField extends StatelessWidget {
   const FinTrackerTextFormField({
@@ -30,22 +31,28 @@ class FinTrackerTextFormField extends StatelessWidget {
           color: AppColors.darkGreen,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimens.radius12),
           borderSide: const BorderSide(color: AppColors.darkGreen),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.darkGreen, width: 1.5),
+          borderRadius: BorderRadius.circular(AppDimens.radius12),
+          borderSide: const BorderSide(
+            color: AppColors.darkGreen,
+            width: AppDimens.borderWidth1_5,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.darkGreen, width: 2),
+          borderRadius: BorderRadius.circular(AppDimens.radius12),
+          borderSide: const BorderSide(
+            color: AppColors.darkGreen,
+            width: AppDimens.borderWidth2,
+          ),
         ),
         filled: true,
         fillColor: AppColors.white,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
+          horizontal: AppDimens.spacing16,
+          vertical: AppDimens.spacing16,
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../viewmodel/chat_viewmodel.dart';
 import '../state/chat_state.dart';
 import '../state/chat_effect.dart';
@@ -28,7 +29,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         effect.when(
           showError: (message) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(message), backgroundColor: Colors.red),
+              SnackBar(
+                content: Text(message.substring(0, 200)),
+                backgroundColor: Colors.red,
+              ),
             );
           },
         );
@@ -48,7 +52,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: AppDimens.duration300ms),
         curve: Curves.easeOut,
       );
     }
@@ -66,16 +70,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text('Gemma AI Model not found'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimens.spacing16),
               ElevatedButton(
                 onPressed: () {
                   ref
                       .read(chatViewModelProvider.notifier)
                       .onEvent(const ChatEvent.downloadModel());
                 },
-                child: const Text('Download Gemma 2B Model'),
+                child: const Text('Download Gemma 3N Model'),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimens.spacing16),
               OutlinedButton(
                 onPressed: () {
                   ref
@@ -84,10 +88,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 },
                 child: const Text('Pick Model from Files'),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimens.spacing16),
               const Text(
                 '~500MB download required\n⚠️ Requires physical iOS device\n(Not compatible with simulators)',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: AppDimens.fontSize12,
+                  color: Colors.grey,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -98,15 +105,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Downloading Gemma 2B AI Model...'),
-              const SizedBox(height: 16),
+              const Text('Downloading Gemma 3N AI Model...'),
+              const SizedBox(height: AppDimens.spacing16),
               LinearProgressIndicator(value: progress),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimens.spacing8),
               Text('${(progress * 100).toStringAsFixed(1)}%'),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimens.spacing8),
               const Text(
                 'This may take several minutes',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: AppDimens.fontSize12,
+                  color: Colors.grey,
+                ),
               ),
             ],
           ),
@@ -122,7 +132,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 child: ListView.builder(
                   controller: _scrollController,
                   itemCount: messages.length,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimens.spacing16),
                   itemBuilder: (context, index) {
                     final message = messages[index];
                     return Align(
@@ -130,16 +140,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           ? Alignment.centerRight
                           : Alignment.centerLeft,
                       child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.symmetric(
+                          vertical: AppDimens.spacing4,
+                        ),
+                        padding: const EdgeInsets.all(AppDimens.spacing12),
                         decoration: BoxDecoration(
                           color: message.isUser
                               ? Theme.of(context).primaryColor
                               : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(
+                            AppDimens.radius12,
+                          ),
                         ),
                         constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.8,
+                          maxWidth:
+                              MediaQuery.of(context).size.width *
+                              AppDimens.maxWidthRatio,
                         ),
                         child: message.isUser
                             ? Text(
@@ -153,7 +169,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppDimens.spacing8),
                 child: Row(
                   children: [
                     Expanded(
