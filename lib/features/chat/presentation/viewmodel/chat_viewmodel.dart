@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../domain/repository/chat_repository.dart';
+import '../../domain/usecase/chat_usecase.dart';
 import '../../di/chat_provider.dart';
 import '../state/chat_state.dart';
 import '../state/chat_effect.dart';
@@ -11,16 +11,16 @@ import '../../domain/entity/chat_message.dart';
 final chatViewModelProvider = StateNotifierProvider<ChatViewModel, ChatState>((
   ref,
 ) {
-  return ChatViewModel(ref.read(chatRepositoryProvider));
+  return ChatViewModel(ref.read(chatUseCaseProvider));
 });
 
 class ChatViewModel extends StateNotifier<ChatState> {
-  final ChatRepository _repository;
+  final ChatUseCase _chatUseCase;
   final _effectController = StreamController<ChatEffect>.broadcast();
 
   Stream<ChatEffect> get effectStream => _effectController.stream;
 
-  ChatViewModel(this._repository) : super(const ChatState.initial()) {
+  ChatViewModel(this._chatUseCase) : super(const ChatState.initial()) {
     onEvent(const ChatEvent.checkModelStatus());
   }
 
@@ -35,9 +35,9 @@ class ChatViewModel extends StateNotifier<ChatState> {
 
   Future<void> _checkModelStatus() async {
     try {
-      final isDownloaded = await _repository.isModelDownloaded();
+      final isDownloaded = await _chatUseCase.checkModelStatus();
       if (isDownloaded) {
-        await _repository.initialize();
+        await _chatUseCase.initializeModel();
         state = const ChatState.ready([]);
       } else {
         state = const ChatState.initial();
@@ -51,14 +51,14 @@ class ChatViewModel extends StateNotifier<ChatState> {
   Future<void> _downloadModel() async {
     state = const ChatState.downloading(0);
     try {
-      await _repository.downloadModel(
+      await _chatUseCase.downloadModel(
         onProgress: (received, total) {
           if (total != -1) {
             state = ChatState.downloading(received / total);
           }
         },
       );
-      await _repository.initialize();
+      await _chatUseCase.initializeModel();
       state = const ChatState.ready([]);
     } catch (e) {
       state = ChatState.error("Download failed: ${e.toString()}");
@@ -74,7 +74,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
 
       if (result != null && result.files.single.path != null) {
         state = const ChatState.downloading(0); // Show loading state
-        await _repository.loadModelFromFile(result.files.single.path!);
+        await _chatUseCase.loadModelFromFile(result.files.single.path!);
         state = const ChatState.ready([]);
       }
     } catch (e) {
@@ -99,7 +99,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
     state = ChatState.ready([...currentMessages, userMessage]);
 
     try {
-      final responseStream = _repository.generateResponse(text);
+      final responseStream = _chatUseCase.sendMessage(text);
       String fullResponse = "";
 
       // Add placeholder bot message
