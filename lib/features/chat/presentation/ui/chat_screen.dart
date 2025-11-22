@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -19,33 +18,11 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late final StreamSubscription<ChatEffect> _effectSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    final notifier = ref.read(chatViewModelProvider.notifier);
-    _effectSubscription = notifier.effectStream.listen((effect) {
-      if (mounted) {
-        effect.when(
-          showError: (message) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(message.substring(0, 200)),
-                backgroundColor: Colors.red,
-              ),
-            );
-          },
-        );
-      }
-    });
-  }
 
   @override
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
-    _effectSubscription.cancel();
     super.dispose();
   }
 
@@ -63,10 +40,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(chatViewModelProvider);
 
+    // Listen for one-shot events
+    ref.listen(chatViewModelProvider.select((s) => s.oneShotEvent), (
+      _,
+      effect,
+    ) {
+      if (effect != null) {
+        effect.when(
+          showError: (message) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message.substring(0, 200)),
+                backgroundColor: Colors.red,
+              ),
+            );
+          },
+        );
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.chatTitle)),
-      body: state.when(
-        initial: () => Center(
+      body: _buildBody(state),
+    );
+  }
+
+  Widget _buildBody(ChatState state) {
+    switch (state.status) {
+      case ChatStatus.initial:
+        return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -100,17 +102,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
             ],
           ),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        downloading: (progress) => Center(
+        );
+      case ChatStatus.loading:
+        return const Center(child: CircularProgressIndicator());
+      case ChatStatus.downloading:
+        return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(AppStrings.downloadingModel),
               const SizedBox(height: AppDimens.spacing16),
-              LinearProgressIndicator(value: progress),
+              LinearProgressIndicator(value: state.downloadProgress),
               const SizedBox(height: AppDimens.spacing8),
-              Text('${(progress * 100).toStringAsFixed(1)}%'),
+              Text('${(state.downloadProgress * 100).toStringAsFixed(1)}%'),
               const SizedBox(height: AppDimens.spacing8),
               const Text(
                 AppStrings.downloadTimeWarning,
@@ -121,94 +125,100 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
             ],
           ),
+        );
+      case ChatStatus.error:
+        // If we have messages, show chat with error snackbar (handled by listener)
+        // If no messages and error status, show error center widget
+        if (state.messages.isNotEmpty) {
+          return _buildChat(state.messages);
+        }
+        return Center(
+          child: Text('${AppStrings.errorPrefix}${state.errorMessage}'),
+        );
+      case ChatStatus.ready:
+        return _buildChat(state.messages);
+    }
+  }
+
+  Widget _buildChat(List<dynamic> messages) {
+    // dynamic to avoid import issue if ChatMessage not imported, but it is.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            controller: _scrollController,
+            itemCount: messages.length,
+            padding: const EdgeInsets.all(AppDimens.spacing16),
+            itemBuilder: (context, index) {
+              final message = messages[index];
+              return Align(
+                alignment: message.isUser
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: AppDimens.spacing4,
+                  ),
+                  padding: const EdgeInsets.all(AppDimens.spacing12),
+                  decoration: BoxDecoration(
+                    color: message.isUser
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(AppDimens.radius12),
+                  ),
+                  constraints: BoxConstraints(
+                    maxWidth:
+                        MediaQuery.of(context).size.width *
+                        AppDimens.maxWidthRatio,
+                  ),
+                  child: message.isUser
+                      ? Text(
+                          message.text,
+                          style: const TextStyle(color: Colors.white),
+                        )
+                      : MarkdownBody(data: message.text),
+                ),
+              );
+            },
+          ),
         ),
-        error: (message) =>
-            Center(child: Text('${AppStrings.errorPrefix}$message')),
-        ready: (messages) {
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) => _scrollToBottom(),
-          );
-          return Column(
+        Padding(
+          padding: const EdgeInsets.all(AppDimens.spacing8),
+          child: Row(
             children: [
               Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: messages.length,
-                  padding: const EdgeInsets.all(AppDimens.spacing16),
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    return Align(
-                      alignment: message.isUser
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                          vertical: AppDimens.spacing4,
-                        ),
-                        padding: const EdgeInsets.all(AppDimens.spacing12),
-                        decoration: BoxDecoration(
-                          color: message.isUser
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(
-                            AppDimens.radius12,
-                          ),
-                        ),
-                        constraints: BoxConstraints(
-                          maxWidth:
-                              MediaQuery.of(context).size.width *
-                              AppDimens.maxWidthRatio,
-                        ),
-                        child: message.isUser
-                            ? Text(
-                                message.text,
-                                style: const TextStyle(color: Colors.white),
-                              )
-                            : MarkdownBody(data: message.text),
-                      ),
-                    );
+                child: TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    hintText: AppStrings.typeMessageHint,
+                    border: OutlineInputBorder(),
+                  ),
+                  onSubmitted: (value) {
+                    if (value.isNotEmpty) {
+                      ref
+                          .read(chatViewModelProvider.notifier)
+                          .onEvent(ChatEvent.sendMessage(value));
+                      _controller.clear();
+                    }
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(AppDimens.spacing8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        decoration: const InputDecoration(
-                          hintText: AppStrings.typeMessageHint,
-                          border: OutlineInputBorder(),
-                        ),
-                        onSubmitted: (value) {
-                          if (value.isNotEmpty) {
-                            ref
-                                .read(chatViewModelProvider.notifier)
-                                .onEvent(ChatEvent.sendMessage(value));
-                            _controller.clear();
-                          }
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.send),
-                      onPressed: () {
-                        if (_controller.text.isNotEmpty) {
-                          ref
-                              .read(chatViewModelProvider.notifier)
-                              .onEvent(ChatEvent.sendMessage(_controller.text));
-                          _controller.clear();
-                        }
-                      },
-                    ),
-                  ],
-                ),
+              IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: () {
+                  if (_controller.text.isNotEmpty) {
+                    ref
+                        .read(chatViewModelProvider.notifier)
+                        .onEvent(ChatEvent.sendMessage(_controller.text));
+                    _controller.clear();
+                  }
+                },
               ),
             ],
-          );
-        },
-      ),
+          ),
+        ),
+      ],
     );
   }
 }

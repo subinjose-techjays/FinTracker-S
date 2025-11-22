@@ -1,13 +1,20 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entity/chat_message.dart';
+import 'chat_effect.dart';
 
 part 'chat_state.freezed.dart';
 
+enum ChatStatus { initial, loading, downloading, ready, error }
+
 @freezed
-class ChatState with _$ChatState {
-  const factory ChatState.initial() = ChatStateInitial;
-  const factory ChatState.loading() = ChatStateLoading;
-  const factory ChatState.downloading(double progress) = ChatStateDownloading;
-  const factory ChatState.ready(List<ChatMessage> messages) = ChatStateReady;
-  const factory ChatState.error(String message) = ChatStateError;
+abstract class ChatState with _$ChatState {
+  const factory ChatState({
+    @Default(ChatStatus.initial) ChatStatus status,
+    @Default([]) List<ChatMessage> messages,
+    @Default(0.0) double downloadProgress,
+    String? errorMessage,
+    ChatEffect? oneShotEvent,
+  }) = _ChatState;
+
+  const ChatState._();
 }

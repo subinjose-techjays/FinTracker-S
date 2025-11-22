@@ -16,11 +16,8 @@ final chatViewModelProvider = StateNotifierProvider<ChatViewModel, ChatState>((
 
 class ChatViewModel extends StateNotifier<ChatState> {
   final ChatUseCase _chatUseCase;
-  final _effectController = StreamController<ChatEffect>.broadcast();
 
-  Stream<ChatEffect> get effectStream => _effectController.stream;
-
-  ChatViewModel(this._chatUseCase) : super(const ChatState.initial()) {
+  ChatViewModel(this._chatUseCase) : super(const ChatState()) {
     onEvent(const ChatEvent.checkModelStatus());
   }
 
@@ -38,32 +35,36 @@ class ChatViewModel extends StateNotifier<ChatState> {
       final isDownloaded = await _chatUseCase.checkModelStatus();
       if (isDownloaded) {
         await _chatUseCase.initializeModel();
-        state = const ChatState.ready([]);
+        state = state.copyWith(status: ChatStatus.ready);
       } else {
-        state = const ChatState.initial();
+        state = state.copyWith(status: ChatStatus.initial);
       }
     } catch (e) {
-      state = ChatState.error(e.toString());
-      _effectController.add(ChatEffect.showError(e.toString()));
+      state = state.copyWith(
+        status: ChatStatus.error,
+        errorMessage: e.toString(),
+        oneShotEvent: ChatEffect.showError(e.toString()),
+      );
     }
   }
 
   Future<void> _downloadModel() async {
-    state = const ChatState.downloading(0);
+    state = state.copyWith(status: ChatStatus.downloading, downloadProgress: 0);
     try {
       await _chatUseCase.downloadModel(
         onProgress: (received, total) {
           if (total != -1) {
-            state = ChatState.downloading(received / total);
+            state = state.copyWith(downloadProgress: received / total);
           }
         },
       );
       await _chatUseCase.initializeModel();
-      state = const ChatState.ready([]);
+      state = state.copyWith(status: ChatStatus.ready);
     } catch (e) {
-      state = ChatState.error("Download failed: ${e.toString()}");
-      _effectController.add(
-        ChatEffect.showError("Download failed: ${e.toString()}"),
+      state = state.copyWith(
+        status: ChatStatus.error,
+        errorMessage: "Download failed: ${e.toString()}",
+        oneShotEvent: ChatEffect.showError("Download failed: ${e.toString()}"),
       );
     }
   }
@@ -73,41 +74,48 @@ class ChatViewModel extends StateNotifier<ChatState> {
       final result = await FilePicker.platform.pickFiles(type: FileType.any);
 
       if (result != null && result.files.single.path != null) {
-        state = const ChatState.downloading(0); // Show loading state
+        state = state.copyWith(
+          status: ChatStatus.downloading,
+          downloadProgress: 0,
+        );
         await _chatUseCase.loadModelFromFile(result.files.single.path!);
-        state = const ChatState.ready([]);
+        state = state.copyWith(status: ChatStatus.ready);
       }
     } catch (e) {
-      state = ChatState.error("Failed to load model: ${e.toString()}");
-      _effectController.add(
-        ChatEffect.showError("Failed to load model: ${e.toString()}"),
+      state = state.copyWith(
+        status: ChatStatus.error,
+        errorMessage: "Failed to load model: ${e.toString()}",
+        oneShotEvent: ChatEffect.showError(
+          "Failed to load model: ${e.toString()}",
+        ),
       );
     }
   }
 
   Future<void> _sendMessage(String text) async {
-    final currentState = state;
-    if (currentState is! ChatStateReady) return;
+    if (state.status != ChatStatus.ready) return;
 
-    final currentMessages = List<ChatMessage>.from(currentState.messages);
+    final currentMessages = List<ChatMessage>.from(state.messages);
     final userMessage = ChatMessage(
       text: text,
       isUser: true,
       timestamp: DateTime.now(),
     );
 
-    state = ChatState.ready([...currentMessages, userMessage]);
+    state = state.copyWith(messages: [...currentMessages, userMessage]);
 
     try {
       final responseStream = _chatUseCase.sendMessage(text);
       String fullResponse = "";
 
       // Add placeholder bot message
-      state = ChatState.ready([
-        ...currentMessages,
-        userMessage,
-        ChatMessage(text: "...", isUser: false, timestamp: DateTime.now()),
-      ]);
+      state = state.copyWith(
+        messages: [
+          ...currentMessages,
+          userMessage,
+          ChatMessage(text: "...", isUser: false, timestamp: DateTime.now()),
+        ],
+      );
 
       await for (final chunk in responseStream) {
         fullResponse += chunk;
@@ -121,17 +129,11 @@ class ChatViewModel extends StateNotifier<ChatState> {
               timestamp: DateTime.now(),
             ),
           );
-        state = ChatState.ready(updatedMessages);
+        state = state.copyWith(messages: updatedMessages);
       }
     } catch (e) {
-      state = ChatState.error(e.toString());
-      _effectController.add(ChatEffect.showError(e.toString()));
+      // Don't change status to error to preserve chat history
+      state = state.copyWith(oneShotEvent: ChatEffect.showError(e.toString()));
     }
-  }
-
-  @override
-  void dispose() {
-    _effectController.close();
-    super.dispose();
   }
 }
