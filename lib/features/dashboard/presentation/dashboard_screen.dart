@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
-import 'package:fin_tracker/features/login/di/providers.dart';
+import 'package:fin_tracker/features/login/di/login_provider.dart';
+import 'package:fin_tracker/features/dashboard/di/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

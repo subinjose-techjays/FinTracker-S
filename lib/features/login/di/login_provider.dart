@@ -70,9 +70,3 @@ final currentUserProvider = StreamProvider<User?>((ref) {
   final firebaseAuth = ref.watch(firebaseAuthProvider);
   return firebaseAuth.authStateChanges();
 });
-
-/// Provides the sign out use case for dashboard functionality.
-final dashboardSignOutUseCaseProvider = Provider<SignOutUseCase>((ref) {
-  final authRepository = ref.watch(authRepositoryProvider);
-  return SignOutUseCase(authRepository);
-});

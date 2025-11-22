@@ -6,7 +6,7 @@ import 'package:fin_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../di/providers.dart';
+import '../../di/login_provider.dart';
 import '../event/login_events.dart';
 import '../state/login_state/login_effect.dart';
 
@@ -145,10 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.lightGrey,
-                      width: 1,
-                    ),
+                    border: Border.all(color: AppColors.lightGrey, width: 1),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -237,9 +234,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red.withOpacity(0.3),
-                      ),
+                      border: Border.all(color: Colors.red.withOpacity(0.3)),
                     ),
                     child: Row(
                       children: [
