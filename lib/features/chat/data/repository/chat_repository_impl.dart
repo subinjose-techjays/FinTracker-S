@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tar/tar.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import '../../domain/repository/chat_repository.dart';
+import '../../../../core/constants/app_constants.dart';
 
 /// Chat Repository Implementation with Gemma AI Model
 ///
@@ -49,9 +50,9 @@ class ChatRepositoryImpl implements ChatRepository {
           modelType: ModelType.gemmaIt,
         ).fromFile(modelPath).install();
 
-import '../../../../core/constants/app_constants.dart';
-
-        final model = await FlutterGemma.getActiveModel(maxTokens: AppConstants.gemmaMaxTokens);
+        final model = await FlutterGemma.getActiveModel(
+          maxTokens: AppConstants.gemmaMaxTokens,
+        );
         _chat = await model.createChat();
 
         print('Gemma model initialized successfully at $modelPath');
