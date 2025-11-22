@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../../../core/theme/app_dimens.dart';
+import '../../../../core/constants/app_strings.dart';
 import '../viewmodel/chat_viewmodel.dart';
 import '../state/chat_state.dart';
 import '../state/chat_effect.dart';
@@ -63,13 +64,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final state = ref.watch(chatViewModelProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat with Gemma AI')),
+      appBar: AppBar(title: const Text(AppStrings.chatTitle)),
       body: state.when(
         initial: () => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Gemma AI Model not found'),
+              const Text(AppStrings.modelNotFound),
               const SizedBox(height: AppDimens.spacing16),
               ElevatedButton(
                 onPressed: () {
@@ -77,7 +78,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       .read(chatViewModelProvider.notifier)
                       .onEvent(const ChatEvent.downloadModel());
                 },
-                child: const Text('Download Gemma 3N Model'),
+                child: const Text(AppStrings.downloadModel),
               ),
               const SizedBox(height: AppDimens.spacing16),
               OutlinedButton(
@@ -86,11 +87,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       .read(chatViewModelProvider.notifier)
                       .onEvent(const ChatEvent.pickModelFile());
                 },
-                child: const Text('Pick Model from Files'),
+                child: const Text(AppStrings.pickModel),
               ),
               const SizedBox(height: AppDimens.spacing16),
               const Text(
-                '~500MB download required\n⚠️ Requires physical iOS device\n(Not compatible with simulators)',
+                AppStrings.downloadRequirement,
                 style: TextStyle(
                   fontSize: AppDimens.fontSize12,
                   color: Colors.grey,
@@ -105,14 +106,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Downloading Gemma 3N AI Model...'),
+              const Text(AppStrings.downloadingModel),
               const SizedBox(height: AppDimens.spacing16),
               LinearProgressIndicator(value: progress),
               const SizedBox(height: AppDimens.spacing8),
               Text('${(progress * 100).toStringAsFixed(1)}%'),
               const SizedBox(height: AppDimens.spacing8),
               const Text(
-                'This may take several minutes',
+                AppStrings.downloadTimeWarning,
                 style: TextStyle(
                   fontSize: AppDimens.fontSize12,
                   color: Colors.grey,
@@ -121,7 +122,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ],
           ),
         ),
-        error: (message) => Center(child: Text('Error: $message')),
+        error: (message) =>
+            Center(child: Text('${AppStrings.errorPrefix}$message')),
         ready: (messages) {
           WidgetsBinding.instance.addPostFrameCallback(
             (_) => _scrollToBottom(),
@@ -176,7 +178,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       child: TextField(
                         controller: _controller,
                         decoration: const InputDecoration(
-                          hintText: 'Type a message...',
+                          hintText: AppStrings.typeMessageHint,
                           border: OutlineInputBorder(),
                         ),
                         onSubmitted: (value) {

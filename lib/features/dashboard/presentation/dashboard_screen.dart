@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
 import 'package:fin_tracker/core/theme/app_dimens.dart';
+import 'package:fin_tracker/core/constants/app_strings.dart';
 import 'package:fin_tracker/features/login/di/login_provider.dart';
 import 'package:fin_tracker/features/dashboard/di/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class DashboardScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.deepGreen,
         title: const Text(
-          'FinTracker Dashboard',
+          AppStrings.dashboardTitle,
           style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w600),
         ),
         actions: [
@@ -37,7 +38,7 @@ class DashboardScreen extends ConsumerWidget {
       body: userAsyncValue.when(
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('No user logged in'));
+            return const Center(child: Text(AppStrings.noUserLoggedIn));
           }
           return _buildUserProfile(context, user);
         },
@@ -47,7 +48,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
         error: (error, stack) =>
-            Center(child: Text('Error loading user: $error')),
+            Center(child: Text('${AppStrings.errorLoadingUser}$error')),
       ),
     );
   }
@@ -98,7 +99,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppDimens.spacing16),
                 Text(
-                  user.displayName ?? 'Welcome!',
+                  user.displayName ?? AppStrings.welcomeDefault,
                   style: const TextStyle(
                     fontSize: AppDimens.fontSize24,
                     fontWeight: FontWeight.bold,
@@ -107,7 +108,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppDimens.spacing8),
                 Text(
-                  'Financial Tracker',
+                  AppStrings.financialTracker,
                   style: TextStyle(
                     fontSize: AppDimens.fontSize16,
                     color: AppColors.deepGreen.withOpacity(AppDimens.opacity70),
@@ -121,7 +122,7 @@ class DashboardScreen extends ConsumerWidget {
 
           // Account Information Section
           const Text(
-            'Account Information',
+            AppStrings.accountInformation,
             style: TextStyle(
               fontSize: AppDimens.fontSize20,
               fontWeight: FontWeight.bold,
@@ -132,17 +133,25 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: AppDimens.spacing16),
 
           // User Details Cards
-          _buildInfoCard('Email', user.email ?? 'Not provided', Icons.email),
-
-          const SizedBox(height: AppDimens.spacing12),
-
-          _buildInfoCard('User ID', user.uid, Icons.account_circle),
+          _buildInfoCard(
+            AppStrings.emailLabel,
+            user.email ?? AppStrings.notProvided,
+            Icons.email,
+          ),
 
           const SizedBox(height: AppDimens.spacing12),
 
           _buildInfoCard(
-            'Email Verified',
-            user.emailVerified ? 'Yes' : 'No',
+            AppStrings.userIdLabel,
+            user.uid,
+            Icons.account_circle,
+          ),
+
+          const SizedBox(height: AppDimens.spacing12),
+
+          _buildInfoCard(
+            AppStrings.emailVerifiedLabel,
+            user.emailVerified ? AppStrings.yes : AppStrings.no,
             user.emailVerified ? Icons.verified : Icons.verified_outlined,
             iconColor: user.emailVerified ? AppColors.deepGreen : Colors.orange,
           ),
@@ -150,7 +159,7 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: AppDimens.spacing12),
 
           _buildInfoCard(
-            'Account Created',
+            AppStrings.accountCreatedLabel,
             _formatDate(user.metadata.creationTime),
             Icons.calendar_today,
           ),
@@ -158,7 +167,7 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: AppDimens.spacing12),
 
           _buildInfoCard(
-            'Last Sign In',
+            AppStrings.lastSignInLabel,
             _formatDate(user.metadata.lastSignInTime),
             Icons.access_time,
           ),
@@ -168,7 +177,7 @@ class DashboardScreen extends ConsumerWidget {
           // Provider Information
           if (user.providerData.isNotEmpty) ...[
             const Text(
-              'Authentication Provider',
+              AppStrings.authProviderLabel,
               style: TextStyle(
                 fontSize: AppDimens.fontSize20,
                 fontWeight: FontWeight.bold,
@@ -201,7 +210,7 @@ class DashboardScreen extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       user.providerData.first.providerId == 'google.com'
-                          ? 'Google Account'
+                          ? AppStrings.googleAccount
                           : user.providerData.first.providerId,
                       style: const TextStyle(
                         fontSize: AppDimens.fontSize16,
@@ -277,7 +286,7 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return 'Unknown';
+    if (dateTime == null) return AppStrings.unknownDate;
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} at ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
@@ -287,21 +296,21 @@ class DashboardScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.white,
         title: const Text(
-          'Sign Out',
+          AppStrings.signOutTitle,
           style: TextStyle(
             color: AppColors.deepGreen,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: const Text(
-          'Are you sure you want to sign out?',
+          AppStrings.signOutConfirmation,
           style: TextStyle(color: AppColors.deepGreen),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              'Cancel',
+              AppStrings.cancel,
               style: TextStyle(
                 color: AppColors.deepGreen.withOpacity(AppDimens.opacity70),
               ),
@@ -322,7 +331,7 @@ class DashboardScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Sign out failed: $e'),
+                      content: Text('${AppStrings.signOutFailed}$e'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -330,7 +339,7 @@ class DashboardScreen extends ConsumerWidget {
               }
             },
             child: const Text(
-              'Sign Out',
+              AppStrings.signOutButton,
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),

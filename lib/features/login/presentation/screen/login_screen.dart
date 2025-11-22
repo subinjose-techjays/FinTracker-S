@@ -4,6 +4,7 @@ import 'package:fin_tracker/features/login/presentation/state/login_state/login_
 import 'package:go_router/go_router.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
 import 'package:fin_tracker/core/theme/app_dimens.dart';
+import 'package:fin_tracker/core/constants/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -79,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // App Title
                 const Text(
-                  'FinTracker',
+                  AppStrings.appName,
                   style: TextStyle(
                     fontSize: AppDimens.fontSize32,
                     fontWeight: FontWeight.bold,
@@ -91,7 +92,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Subtitle
                 Text(
-                  'Your Personal Finance Companion',
+                  AppStrings.appSubtitle,
                   style: TextStyle(
                     fontSize: AppDimens.fontSize16,
                     color: AppColors.deepGreen.withOpacity(AppDimens.opacity70),
@@ -118,7 +119,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     children: [
                       Text(
-                        'Welcome Back!',
+                        AppStrings.welcomeBack,
                         style: TextStyle(
                           fontSize: AppDimens.fontSize24,
                           fontWeight: FontWeight.bold,
@@ -127,7 +128,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: AppDimens.spacing8),
                       Text(
-                        'Sign in with your Google account to access your financial dashboard and track your expenses.',
+                        AppStrings.loginSubtitle,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: AppDimens.fontSize14,
@@ -209,7 +210,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ),
                               orElse: () => const Text(
-                                "Continue with Google",
+                                AppStrings.continueWithGoogle,
                                 style: TextStyle(
                                   color: AppColors.deepGreen,
                                   fontSize: AppDimens.fontSize16,
@@ -228,7 +229,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Terms and Privacy
                 Text(
-                  'By continuing, you agree to our Terms of Service and Privacy Policy',
+                  AppStrings.termsAndPrivacy,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: AppDimens.fontSize12,
@@ -306,7 +307,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: AppDimens.spacing20),
             const Text(
-              "bottom_sheet_displayed",
+              AppStrings.bottomSheetDisplayed,
               style: TextStyle(
                 fontSize: AppDimens.fontSize16,
                 color: AppColors.deepGreen,
