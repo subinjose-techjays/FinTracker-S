@@ -8,4 +8,5 @@ class ChatEvent with _$ChatEvent {
   const factory ChatEvent.sendMessage(String message) = SendMessageEvent;
   const factory ChatEvent.checkModelStatus() = CheckModelStatusEvent;
   const factory ChatEvent.pickModelFile() = PickModelFileEvent;
+  const factory ChatEvent.stopGeneration() = StopGenerationEvent;
 }

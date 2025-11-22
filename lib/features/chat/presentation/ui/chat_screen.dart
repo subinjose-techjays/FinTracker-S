@@ -89,37 +89,43 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         return ChatModelDownloadView(progress: state.downloadProgress);
       case ChatStatus.error:
         if (state.messages.isNotEmpty) {
-          return _buildChat(state.messages);
+          return _buildChat(state);
         }
         return Center(
           child: Text('${AppStrings.errorPrefix}${state.errorMessage}'),
         );
       case ChatStatus.ready:
-        return _buildChat(state.messages);
+        return _buildChat(state);
     }
   }
 
-  Widget _buildChat(List<dynamic> messages) {
+  Widget _buildChat(ChatState state) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     return Column(
       children: [
         Expanded(
           child: ListView.builder(
             controller: _scrollController,
-            itemCount: messages.length,
+            itemCount: state.messages.length,
             padding: const EdgeInsets.all(AppDimens.spacing16),
             itemBuilder: (context, index) {
-              return ChatMessageItem(message: messages[index]);
+              return ChatMessageItem(message: state.messages[index]);
             },
           ),
         ),
         ChatInputArea(
           controller: _controller,
+          isGenerating: state.isGenerating,
           onSend: (text) {
             ref
                 .read(chatViewModelProvider.notifier)
                 .onEvent(ChatEvent.sendMessage(text));
             _controller.clear();
+          },
+          onStop: () {
+            ref
+                .read(chatViewModelProvider.notifier)
+                .onEvent(const ChatEvent.stopGeneration());
           },
         ),
       ],

@@ -17,6 +17,7 @@ final chatViewModelProvider = StateNotifierProvider<ChatViewModel, ChatState>((
 
 class ChatViewModel extends StateNotifier<ChatState> {
   final ChatUseCase _chatUseCase;
+  StreamSubscription? _responseSubscription;
 
   ChatViewModel(this._chatUseCase) : super(const ChatState()) {
     onEvent(const ChatEvent.checkModelStatus());
@@ -28,6 +29,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
       downloadModel: (_) => _downloadModel(),
       pickModelFile: (_) => _pickModelFile(),
       sendMessage: (e) => _sendMessage(e.message),
+      stopGeneration: (_) => _stopGeneration(),
     );
   }
 
@@ -72,6 +74,12 @@ class ChatViewModel extends StateNotifier<ChatState> {
     }
   }
 
+  @override
+  void dispose() {
+    _responseSubscription?.cancel();
+    super.dispose();
+  }
+
   Future<void> _pickModelFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(type: FileType.any);
@@ -105,7 +113,10 @@ class ChatViewModel extends StateNotifier<ChatState> {
       timestamp: DateTime.now(),
     );
 
-    state = state.copyWith(messages: [...currentMessages, userMessage]);
+    state = state.copyWith(
+      messages: [...currentMessages, userMessage],
+      isGenerating: true,
+    );
 
     try {
       final responseStream = _chatUseCase.sendMessage(text);
@@ -124,23 +135,46 @@ class ChatViewModel extends StateNotifier<ChatState> {
         ],
       );
 
-      await for (final chunk in responseStream) {
-        fullResponse += chunk;
-        // Update the last message with new content
-        final updatedMessages = List<ChatMessage>.from(currentMessages)
-          ..add(userMessage)
-          ..add(
-            ChatMessage(
-              text: fullResponse,
-              isUser: false,
-              timestamp: DateTime.now(),
-            ),
+      _responseSubscription?.cancel();
+      _responseSubscription = responseStream.listen(
+        (chunk) {
+          fullResponse += chunk;
+          // Update the last message with new content
+          final updatedMessages = List<ChatMessage>.from(currentMessages)
+            ..add(userMessage)
+            ..add(
+              ChatMessage(
+                text: fullResponse,
+                isUser: false,
+                timestamp: DateTime.now(),
+              ),
+            );
+          state = state.copyWith(messages: updatedMessages);
+        },
+        onDone: () {
+          state = state.copyWith(isGenerating: false);
+        },
+        onError: (e) {
+          state = state.copyWith(
+            isGenerating: false,
+            oneShotEvent: ChatEffect.showError(e.toString()),
           );
-        state = state.copyWith(messages: updatedMessages);
-      }
+        },
+      );
     } catch (e) {
-      // Don't change status to error to preserve chat history
-      state = state.copyWith(oneShotEvent: ChatEffect.showError(e.toString()));
+      state = state.copyWith(
+        isGenerating: false,
+        oneShotEvent: ChatEffect.showError(e.toString()),
+      );
     }
+  }
+
+  void _stopGeneration() {
+    _responseSubscription?.cancel();
+    _responseSubscription = null;
+    state = state.copyWith(
+      isGenerating: false,
+      oneShotEvent: const ChatEffect.showError(AppStrings.generationStopped),
+    );
   }
 }

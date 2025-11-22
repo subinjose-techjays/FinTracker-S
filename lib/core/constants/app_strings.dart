@@ -14,6 +14,7 @@ class AppStrings {
   static const String loadModelFailed = 'Failed to load model: ';
   static const String botPlaceholder = '...';
   static const String percentSymbol = '%';
+  static const String generationStopped = 'Generation stopped by user.';
 
   // Login Feature
   static const String appName = 'FinTracker';

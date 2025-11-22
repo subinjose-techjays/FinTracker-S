@@ -12,6 +12,7 @@ abstract class ChatState with _$ChatState {
     @Default(ChatStatus.initial) ChatStatus status,
     @Default([]) List<ChatMessage> messages,
     @Default(0.0) double downloadProgress,
+    @Default(false) bool isGenerating,
     String? errorMessage,
     ChatEffect? oneShotEvent,
   }) = _ChatState;

@@ -5,11 +5,15 @@ import '../../../../core/theme/app_dimens.dart';
 class ChatInputArea extends StatelessWidget {
   final TextEditingController controller;
   final Function(String) onSend;
+  final VoidCallback onStop;
+  final bool isGenerating;
 
   const ChatInputArea({
     super.key,
     required this.controller,
     required this.onSend,
+    required this.onStop,
+    required this.isGenerating,
   });
 
   @override
@@ -25,17 +29,21 @@ class ChatInputArea extends StatelessWidget {
                 hintText: AppStrings.typeMessageHint,
                 border: OutlineInputBorder(),
               ),
+              enabled: !isGenerating,
               onSubmitted: (value) {
-                if (value.isNotEmpty) {
+                if (value.isNotEmpty && !isGenerating) {
                   onSend(value);
                 }
               },
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.send),
+            icon: Icon(isGenerating ? Icons.stop : Icons.send),
+            color: isGenerating ? Colors.red : null,
             onPressed: () {
-              if (controller.text.isNotEmpty) {
+              if (isGenerating) {
+                onStop();
+              } else if (controller.text.isNotEmpty) {
                 onSend(controller.text);
               }
             },
