@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
 import 'package:fin_tracker/core/theme/app_dimens.dart';
 import 'package:fin_tracker/core/constants/app_strings.dart';
+import 'package:fin_tracker/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -322,7 +323,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateToDashBoard() {
-    context.go('/dashboard');
+    context.go(AppRoutes.dashboardPath);
   }
 
   @override

@@ -10,6 +10,10 @@ class AppStrings {
   static const String downloadTimeWarning = 'This may take several minutes';
   static const String errorPrefix = 'Error: ';
   static const String typeMessageHint = 'Type a message...';
+  static const String downloadFailed = 'Download failed: ';
+  static const String loadModelFailed = 'Failed to load model: ';
+  static const String botPlaceholder = '...';
+  static const String percentSymbol = '%';
 
   // Login Feature
   static const String appName = 'FinTracker';
@@ -46,4 +50,5 @@ class AppStrings {
   static const String cancel = 'Cancel';
   static const String signOutButton = 'Sign Out';
   static const String signOutFailed = 'Sign out failed: ';
+  static const String googleSignInFailed = 'Google Sign In failed: ';
 }

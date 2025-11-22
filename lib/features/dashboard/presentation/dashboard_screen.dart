@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
 import 'package:fin_tracker/core/theme/app_dimens.dart';
 import 'package:fin_tracker/core/constants/app_strings.dart';
+import 'package:fin_tracker/core/routes/app_routes.dart';
 import 'package:fin_tracker/features/login/di/login_provider.dart';
 import 'package:fin_tracker/features/dashboard/di/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class DashboardScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/chat'),
+        onPressed: () => context.push(AppRoutes.chatPath),
         backgroundColor: AppColors.deepGreen,
         child: const Icon(Icons.chat, color: AppColors.white),
       ),
@@ -325,7 +326,7 @@ class DashboardScreen extends ConsumerWidget {
                 );
                 await signOutUseCase.execute();
                 if (context.mounted) {
-                  context.go('/login');
+                  context.go(AppRoutes.loginPath);
                 }
               } catch (e) {
                 if (context.mounted) {

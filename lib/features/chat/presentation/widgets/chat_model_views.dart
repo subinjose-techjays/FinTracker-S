@@ -59,7 +59,9 @@ class ChatModelDownloadView extends StatelessWidget {
           const SizedBox(height: AppDimens.spacing16),
           LinearProgressIndicator(value: progress),
           const SizedBox(height: AppDimens.spacing8),
-          Text('${(progress * 100).toStringAsFixed(1)}%'),
+          Text(
+            '${(progress * 100).toStringAsFixed(1)}${AppStrings.percentSymbol}',
+          ),
           const SizedBox(height: AppDimens.spacing8),
           const Text(
             AppStrings.downloadTimeWarning,

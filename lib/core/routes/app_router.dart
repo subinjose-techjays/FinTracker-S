@@ -3,42 +3,46 @@ import 'package:go_router/go_router.dart';
 import 'package:fin_tracker/features/login/presentation/screen/login_screen.dart';
 import 'package:fin_tracker/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:fin_tracker/features/chat/presentation/ui/chat_screen.dart';
+import 'app_routes.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: AppRoutes.rootPath,
   redirect: (context, state) {
     final user = FirebaseAuth.instance.currentUser;
-    final isGoingToLogin = state.matchedLocation == '/login';
-    final isGoingToRoot = state.matchedLocation == '/';
+    final isGoingToLogin = state.matchedLocation == AppRoutes.loginPath;
+    final isGoingToRoot = state.matchedLocation == AppRoutes.rootPath;
 
     // If user is not authenticated and not going to login, redirect to login
     if (user == null && !isGoingToLogin) {
-      return '/login';
+      return AppRoutes.loginPath;
     }
 
     // If user is authenticated and going to login or root, redirect to dashboard
     if (user != null && (isGoingToLogin || isGoingToRoot)) {
-      return '/dashboard';
+      return AppRoutes.dashboardPath;
     }
 
     // No redirect needed
     return null;
   },
   routes: [
-    GoRoute(path: '/', redirect: (context, state) => '/login'),
     GoRoute(
-      path: '/login',
-      name: 'login',
+      path: AppRoutes.rootPath,
+      redirect: (context, state) => AppRoutes.loginPath,
+    ),
+    GoRoute(
+      path: AppRoutes.loginPath,
+      name: AppRoutes.loginName,
       builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
-      path: '/dashboard',
-      name: 'dashboard',
+      path: AppRoutes.dashboardPath,
+      name: AppRoutes.dashboardName,
       builder: (context, state) => const DashboardScreen(),
     ),
     GoRoute(
-      path: '/chat',
-      name: 'chat',
+      path: AppRoutes.chatPath,
+      name: AppRoutes.chatName,
       builder: (context, state) => const ChatScreen(),
     ),
   ],

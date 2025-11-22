@@ -5,6 +5,7 @@ import 'package:fin_tracker/features/login/presentation/event/login_events.dart'
 import 'package:riverpod/riverpod.dart';
 import '../state/login_state/login_effect.dart';
 import '../state/login_state/login_state.dart';
+import '../../../../core/constants/app_strings.dart';
 
 /// Manages the state and business logic for the login feature.
 ///
@@ -61,7 +62,9 @@ class LoginViewModel extends StateNotifier<LoginState> {
       // If successful, navigate to dashboard
       _effectController.add(NavigateToDashBoard());
     } catch (e) {
-      state = LoginState.miscError('Google Sign In failed: ${e.toString()}');
+      state = LoginState.miscError(
+        '${AppStrings.googleSignInFailed}${e.toString()}',
+      );
     }
   }
 

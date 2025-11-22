@@ -7,6 +7,7 @@ import '../state/chat_state.dart';
 import '../state/chat_effect.dart';
 import '../event/chat_event.dart';
 import '../../domain/entity/chat_message.dart';
+import '../../../../core/constants/app_strings.dart';
 
 final chatViewModelProvider = StateNotifierProvider<ChatViewModel, ChatState>((
   ref,
@@ -63,8 +64,10 @@ class ChatViewModel extends StateNotifier<ChatState> {
     } catch (e) {
       state = state.copyWith(
         status: ChatStatus.error,
-        errorMessage: "Download failed: ${e.toString()}",
-        oneShotEvent: ChatEffect.showError("Download failed: ${e.toString()}"),
+        errorMessage: "${AppStrings.downloadFailed}${e.toString()}",
+        oneShotEvent: ChatEffect.showError(
+          "${AppStrings.downloadFailed}${e.toString()}",
+        ),
       );
     }
   }
@@ -84,9 +87,9 @@ class ChatViewModel extends StateNotifier<ChatState> {
     } catch (e) {
       state = state.copyWith(
         status: ChatStatus.error,
-        errorMessage: "Failed to load model: ${e.toString()}",
+        errorMessage: "${AppStrings.loadModelFailed}${e.toString()}",
         oneShotEvent: ChatEffect.showError(
-          "Failed to load model: ${e.toString()}",
+          "${AppStrings.loadModelFailed}${e.toString()}",
         ),
       );
     }
@@ -113,7 +116,11 @@ class ChatViewModel extends StateNotifier<ChatState> {
         messages: [
           ...currentMessages,
           userMessage,
-          ChatMessage(text: "...", isUser: false, timestamp: DateTime.now()),
+          ChatMessage(
+            text: AppStrings.botPlaceholder,
+            isUser: false,
+            timestamp: DateTime.now(),
+          ),
         ],
       );
 
