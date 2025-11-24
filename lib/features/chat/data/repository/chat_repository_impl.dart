@@ -110,8 +110,6 @@ class ChatRepositoryImpl implements ChatRepository {
   void resetSession() {
     _chat = null;
     _isFirstMessage = true;
-    // We don't need to re-initialize immediately, generateResponse will do it.
-    // But if we want to clear the history, we must create a new chat.
     // Since createChat() is async and requires the model, we can just set _chat to null.
     // The next generateResponse will call initialize() which creates a new chat.
   }
