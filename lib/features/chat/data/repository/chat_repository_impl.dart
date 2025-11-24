@@ -14,6 +14,7 @@ import '../../../../core/constants/app_constants.dart';
 class ChatRepositoryImpl implements ChatRepository {
   InferenceChat? _chat;
   final Dio _dio;
+  bool _isFirstMessage = true;
 
   ChatRepositoryImpl({required Dio dio}) : _dio = dio;
   final String _modelUrl = AppConstants.gemmaModelUrl;
@@ -51,8 +52,10 @@ class ChatRepositoryImpl implements ChatRepository {
 
         final model = await FlutterGemma.getActiveModel(
           maxTokens: AppConstants.gemmaMaxTokens,
+          preferredBackend: PreferredBackend.gpu,
         );
         _chat = await model.createChat();
+        _isFirstMessage = true;
 
         print('Gemma model initialized successfully at $modelPath');
       } catch (e) {
@@ -140,7 +143,17 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Stream<String> generateResponse(String prompt) async* {
+  void resetSession() {
+    _chat = null;
+    _isFirstMessage = true;
+    // We don't need to re-initialize immediately, generateResponse will do it.
+    // But if we want to clear the history, we must create a new chat.
+    // Since createChat() is async and requires the model, we can just set _chat to null.
+    // The next generateResponse will call initialize() which creates a new chat.
+  }
+
+  @override
+  Stream<String> generateResponse(String prompt, {String? context}) async* {
     if (_chat == null) {
       // Try to initialize if not already done (e.g. if app restarted)
       try {
@@ -154,7 +167,23 @@ class ChatRepositoryImpl implements ChatRepository {
 
     // Generate response using FlutterGemma
     // 1. Add the user's message to the chat history
-    await _chat!.addQueryChunk(Message.text(text: prompt, isUser: true));
+
+    final buffer = StringBuffer();
+
+    if (_isFirstMessage) {
+      buffer.write("${AppConstants.systemInstruction}\n\n");
+      _isFirstMessage = false;
+    }
+
+    if (context != null) {
+      buffer.write("Context: $context\n\n");
+    }
+
+    buffer.write(prompt);
+
+    await _chat!.addQueryChunk(
+      Message.text(text: buffer.toString(), isUser: true),
+    );
 
     // 2. Generate the response stream
     final stream = _chat!

@@ -55,7 +55,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(message.substring(0, 200)),
-                backgroundColor: Colors.red,
+                backgroundColor: Colors.yellow,
               ),
             );
           },
@@ -124,14 +124,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           controller: _controller,
           isGenerating: state.isGenerating,
           onSend: (text) {
-            ref
-                .read(chatViewModelProvider.notifier)
+            ref.read(chatViewModelProvider.notifier)
                 .onEvent(ChatEvent.sendMessage(text));
             _controller.clear();
           },
           onStop: () {
-            ref
-                .read(chatViewModelProvider.notifier)
+            ref.read(chatViewModelProvider.notifier)
                 .onEvent(const ChatEvent.stopGeneration());
           },
         ),

@@ -55,7 +55,7 @@ extension ChatEventPatterns on ChatEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( DownloadModelEvent value)?  downloadModel,TResult Function( SendMessageEvent value)?  sendMessage,TResult Function( CheckModelStatusEvent value)?  checkModelStatus,TResult Function( PickModelFileEvent value)?  pickModelFile,TResult Function( StopGenerationEvent value)?  stopGeneration,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( DownloadModelEvent value)?  downloadModel,TResult Function( SendMessageEvent value)?  sendMessage,TResult Function( CheckModelStatusEvent value)?  checkModelStatus,TResult Function( PickModelFileEvent value)?  pickModelFile,TResult Function( StopGenerationEvent value)?  stopGeneration,TResult Function( ResetChatEvent value)?  resetChat,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case DownloadModelEvent() when downloadModel != null:
@@ -63,7 +63,8 @@ return downloadModel(_that);case SendMessageEvent() when sendMessage != null:
 return sendMessage(_that);case CheckModelStatusEvent() when checkModelStatus != null:
 return checkModelStatus(_that);case PickModelFileEvent() when pickModelFile != null:
 return pickModelFile(_that);case StopGenerationEvent() when stopGeneration != null:
-return stopGeneration(_that);case _:
+return stopGeneration(_that);case ResetChatEvent() when resetChat != null:
+return resetChat(_that);case _:
   return orElse();
 
 }
@@ -81,7 +82,7 @@ return stopGeneration(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( DownloadModelEvent value)  downloadModel,required TResult Function( SendMessageEvent value)  sendMessage,required TResult Function( CheckModelStatusEvent value)  checkModelStatus,required TResult Function( PickModelFileEvent value)  pickModelFile,required TResult Function( StopGenerationEvent value)  stopGeneration,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( DownloadModelEvent value)  downloadModel,required TResult Function( SendMessageEvent value)  sendMessage,required TResult Function( CheckModelStatusEvent value)  checkModelStatus,required TResult Function( PickModelFileEvent value)  pickModelFile,required TResult Function( StopGenerationEvent value)  stopGeneration,required TResult Function( ResetChatEvent value)  resetChat,}){
 final _that = this;
 switch (_that) {
 case DownloadModelEvent():
@@ -89,7 +90,8 @@ return downloadModel(_that);case SendMessageEvent():
 return sendMessage(_that);case CheckModelStatusEvent():
 return checkModelStatus(_that);case PickModelFileEvent():
 return pickModelFile(_that);case StopGenerationEvent():
-return stopGeneration(_that);case _:
+return stopGeneration(_that);case ResetChatEvent():
+return resetChat(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -106,7 +108,7 @@ return stopGeneration(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( DownloadModelEvent value)?  downloadModel,TResult? Function( SendMessageEvent value)?  sendMessage,TResult? Function( CheckModelStatusEvent value)?  checkModelStatus,TResult? Function( PickModelFileEvent value)?  pickModelFile,TResult? Function( StopGenerationEvent value)?  stopGeneration,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( DownloadModelEvent value)?  downloadModel,TResult? Function( SendMessageEvent value)?  sendMessage,TResult? Function( CheckModelStatusEvent value)?  checkModelStatus,TResult? Function( PickModelFileEvent value)?  pickModelFile,TResult? Function( StopGenerationEvent value)?  stopGeneration,TResult? Function( ResetChatEvent value)?  resetChat,}){
 final _that = this;
 switch (_that) {
 case DownloadModelEvent() when downloadModel != null:
@@ -114,7 +116,8 @@ return downloadModel(_that);case SendMessageEvent() when sendMessage != null:
 return sendMessage(_that);case CheckModelStatusEvent() when checkModelStatus != null:
 return checkModelStatus(_that);case PickModelFileEvent() when pickModelFile != null:
 return pickModelFile(_that);case StopGenerationEvent() when stopGeneration != null:
-return stopGeneration(_that);case _:
+return stopGeneration(_that);case ResetChatEvent() when resetChat != null:
+return resetChat(_that);case _:
   return null;
 
 }
@@ -131,14 +134,15 @@ return stopGeneration(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  downloadModel,TResult Function( String message)?  sendMessage,TResult Function()?  checkModelStatus,TResult Function()?  pickModelFile,TResult Function()?  stopGeneration,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  downloadModel,TResult Function( String message)?  sendMessage,TResult Function()?  checkModelStatus,TResult Function()?  pickModelFile,TResult Function()?  stopGeneration,TResult Function()?  resetChat,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case DownloadModelEvent() when downloadModel != null:
 return downloadModel();case SendMessageEvent() when sendMessage != null:
 return sendMessage(_that.message);case CheckModelStatusEvent() when checkModelStatus != null:
 return checkModelStatus();case PickModelFileEvent() when pickModelFile != null:
 return pickModelFile();case StopGenerationEvent() when stopGeneration != null:
-return stopGeneration();case _:
+return stopGeneration();case ResetChatEvent() when resetChat != null:
+return resetChat();case _:
   return orElse();
 
 }
@@ -156,14 +160,15 @@ return stopGeneration();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  downloadModel,required TResult Function( String message)  sendMessage,required TResult Function()  checkModelStatus,required TResult Function()  pickModelFile,required TResult Function()  stopGeneration,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  downloadModel,required TResult Function( String message)  sendMessage,required TResult Function()  checkModelStatus,required TResult Function()  pickModelFile,required TResult Function()  stopGeneration,required TResult Function()  resetChat,}) {final _that = this;
 switch (_that) {
 case DownloadModelEvent():
 return downloadModel();case SendMessageEvent():
 return sendMessage(_that.message);case CheckModelStatusEvent():
 return checkModelStatus();case PickModelFileEvent():
 return pickModelFile();case StopGenerationEvent():
-return stopGeneration();case _:
+return stopGeneration();case ResetChatEvent():
+return resetChat();case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -180,14 +185,15 @@ return stopGeneration();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  downloadModel,TResult? Function( String message)?  sendMessage,TResult? Function()?  checkModelStatus,TResult? Function()?  pickModelFile,TResult? Function()?  stopGeneration,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  downloadModel,TResult? Function( String message)?  sendMessage,TResult? Function()?  checkModelStatus,TResult? Function()?  pickModelFile,TResult? Function()?  stopGeneration,TResult? Function()?  resetChat,}) {final _that = this;
 switch (_that) {
 case DownloadModelEvent() when downloadModel != null:
 return downloadModel();case SendMessageEvent() when sendMessage != null:
 return sendMessage(_that.message);case CheckModelStatusEvent() when checkModelStatus != null:
 return checkModelStatus();case PickModelFileEvent() when pickModelFile != null:
 return pickModelFile();case StopGenerationEvent() when stopGeneration != null:
-return stopGeneration();case _:
+return stopGeneration();case ResetChatEvent() when resetChat != null:
+return resetChat();case _:
   return null;
 
 }
@@ -381,6 +387,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'ChatEvent.stopGeneration()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class ResetChatEvent implements ChatEvent {
+  const ResetChatEvent();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ResetChatEvent);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ChatEvent.resetChat()';
 }
 
 

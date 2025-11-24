@@ -23,7 +23,11 @@ class ChatUseCase {
     return _repository.loadModelFromFile(path);
   }
 
-  Stream<String> sendMessage(String prompt) {
-    return _repository.generateResponse(prompt);
+  Stream<String> sendMessage(String prompt, {String? context}) {
+    return _repository.generateResponse(prompt, context: context);
+  }
+
+  void resetSession() {
+    _repository.resetSession();
   }
 }

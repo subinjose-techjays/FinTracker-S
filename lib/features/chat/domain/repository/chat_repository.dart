@@ -1,5 +1,3 @@
-
-
 abstract class ChatRepository {
   Future<void> initialize();
   Future<bool> isModelDownloaded();
@@ -8,5 +6,6 @@ abstract class ChatRepository {
   });
   Future<void> loadModelFromFile(String path);
 
-  Stream<String> generateResponse(String prompt);
+  Stream<String> generateResponse(String prompt, {String? context});
+  void resetSession();
 }

@@ -30,6 +30,16 @@ class ChatViewModel extends StateNotifier<ChatState> {
       pickModelFile: (_) => _pickModelFile(),
       sendMessage: (e) => _sendMessage(e.message),
       stopGeneration: (_) => _stopGeneration(),
+      resetChat: (_) => _resetChat(),
+    );
+  }
+
+  void _resetChat() {
+    _chatUseCase.resetSession();
+    state = state.copyWith(
+      messages: [],
+      status: ChatStatus.ready,
+      isGenerating: false,
     );
   }
 
@@ -103,7 +113,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
     }
   }
 
-  Future<void> _sendMessage(String text) async {
+  Future<void> _sendMessage(String text, {String? context}) async {
     if (state.status != ChatStatus.ready) return;
 
     final currentMessages = List<ChatMessage>.from(state.messages);
@@ -119,7 +129,7 @@ class ChatViewModel extends StateNotifier<ChatState> {
     );
 
     try {
-      final responseStream = _chatUseCase.sendMessage(text);
+      final responseStream = _chatUseCase.sendMessage(text, context: context);
       String fullResponse = "";
 
       // Add placeholder bot message
