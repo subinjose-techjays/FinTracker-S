@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:tar/tar.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import '../../domain/repository/chat_repository.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../extensions/file_extensions.dart';
 
 /// Chat Repository Implementation with Gemma AI Model
 ///
@@ -28,22 +28,7 @@ class ChatRepositoryImpl implements ChatRepository {
     if (await File(modelPath).exists()) {
       try {
         // Clear XNNPACK cache to prevent "Cannot reserve space" crash on Android
-        if (Platform.isAndroid) {
-          // Check in Documents directory (just in case)
-          final docCacheFile = File('$modelPath.xnnpack_cache');
-          if (await docCacheFile.exists()) {
-            await docCacheFile.delete();
-          }
-
-          // Check in Cache directory (where logs indicate it is)
-          final tempDir = await getTemporaryDirectory();
-          final tempCacheFile = File(
-            '${tempDir.path}/$_modelFileName.xnnpack_cache',
-          );
-          if (await tempCacheFile.exists()) {
-            await tempCacheFile.delete();
-          }
-        }
+        await File(modelPath).clearXnnpackCache(_modelFileName);
 
         // Initialize FlutterGemma with the local model file
         await FlutterGemma.installModel(
@@ -94,28 +79,7 @@ class ChatRepositoryImpl implements ChatRepository {
 
     // 2. Extract the archive using streaming (tar package)
     final file = File(archivePath);
-    // Open the file as a stream of bytes
-    final fileStream = file.openRead();
-    // Decompress using GZip
-    final decompressedStream = fileStream.transform(gzip.decoder);
-    // Read tar entries
-    final reader = TarReader(decompressedStream);
-
-    bool found = false;
-    try {
-      while (await reader.moveNext()) {
-        final entry = reader.current;
-        if (entry.type == TypeFlag.reg && entry.name.endsWith('.task')) {
-          final taskFile = File('${dir.path}/$_modelFileName');
-          // Pipe the entry content stream directly to the file
-          await entry.contents.pipe(taskFile.openWrite());
-          found = true;
-          break; // Stop after finding the model
-        }
-      }
-    } finally {
-      await reader.cancel();
-    }
+    final found = await file.extractGemmaModel(dir.path, _modelFileName);
 
     // 3. Cleanup
     await file.delete();
