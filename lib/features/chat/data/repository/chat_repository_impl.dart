@@ -45,6 +45,7 @@ class ChatRepositoryImpl implements ChatRepository {
         print('Gemma model initialized successfully at $modelPath');
       } catch (e) {
         print('Failed to initialize Gemma engine: $e');
+        // If it was a native crash (which we can't catch in Dart, but if we get here), rethrow
         throw Exception('Failed to initialize AI engine. Error: $e');
       }
     } else {

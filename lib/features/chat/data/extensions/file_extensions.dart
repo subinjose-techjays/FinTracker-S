@@ -35,7 +35,7 @@ extension FileExtensions on File {
         }
       }
     } catch (e) {
-      print('Error clearing model cache: $e');
+      print('Error clearing XNNPACK cache: $e');
     }
   }
 
