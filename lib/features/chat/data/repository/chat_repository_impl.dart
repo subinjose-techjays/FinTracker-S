@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import '../../domain/repository/chat_repository.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../expense/domain/usecase/get_expenses_usecase.dart';
 import '../extensions/file_extensions.dart';
 
 /// Chat Repository Implementation with Gemma AI Model
@@ -15,20 +16,28 @@ class ChatRepositoryImpl implements ChatRepository {
   InferenceChat? _chat;
   final Dio _dio;
   bool _isFirstMessage = true;
+  final GetExpensesUseCase _getExpensesUseCase;
 
-  ChatRepositoryImpl({required Dio dio}) : _dio = dio;
+  ChatRepositoryImpl({
+    required Dio dio,
+    required GetExpensesUseCase getExpensesUseCase,
+  }) : _dio = dio,
+       _getExpensesUseCase = getExpensesUseCase;
+
   final String _modelUrl = AppConstants.gemmaModelUrl;
   final String _modelFileName = AppConstants.gemmaModelFileName;
 
   @override
-  Future<void> initialize() async {
+  Future<void> initialize({bool forceClearCache = false}) async {
     final dir = await getApplicationDocumentsDirectory();
     final modelPath = '${dir.path}/$_modelFileName';
 
     if (await File(modelPath).exists()) {
       try {
-        // Clear model cache to prevent "Cannot reserve space" crash on Android
-        await File(modelPath).clearModelCache(_modelFileName);
+        // Only clear cache if forced (e.g. on new download or error retry)
+        if (forceClearCache) {
+          await File(modelPath).clearModelCache(_modelFileName);
+        }
 
         // Initialize FlutterGemma with the local model file
         await FlutterGemma.installModel(
@@ -45,6 +54,14 @@ class ChatRepositoryImpl implements ChatRepository {
         print('Gemma model initialized successfully at $modelPath');
       } catch (e) {
         print('Failed to initialize Gemma engine: $e');
+
+        // If initialization failed and we haven't tried clearing cache yet, retry
+        if (!forceClearCache) {
+          print('Retrying initialization with cache clear...');
+          await initialize(forceClearCache: true);
+          return;
+        }
+
         // If it was a native crash (which we can't catch in Dart, but if we get here), rethrow
         throw Exception('Failed to initialize AI engine. Error: $e');
       }
@@ -90,7 +107,7 @@ class ChatRepositoryImpl implements ChatRepository {
     }
 
     // 4. Initialize after download
-    await initialize();
+    await initialize(forceClearCache: true);
   }
 
   @override
@@ -101,7 +118,7 @@ class ChatRepositoryImpl implements ChatRepository {
 
     if (await sourceFile.exists()) {
       await sourceFile.copy(targetFile.path);
-      await initialize();
+      await initialize(forceClearCache: true);
     } else {
       throw Exception('Selected file does not exist.');
     }
@@ -113,6 +130,27 @@ class ChatRepositoryImpl implements ChatRepository {
     _isFirstMessage = true;
     // Since createChat() is async and requires the model, we can just set _chat to null.
     // The next generateResponse will call initialize() which creates a new chat.
+  }
+
+  Future<String> _getExpenseContext() async {
+    try {
+      final expenses = await _getExpensesUseCase();
+      if (expenses.isEmpty) {
+        return "User has no recorded expenses.";
+      }
+
+      final buffer = StringBuffer();
+      buffer.writeln("User's Expense History:");
+      for (final expense in expenses) {
+        buffer.writeln(
+          "- ${expense.date.toLocal().toString().split(' ')[0]}: ${expense.title} (${expense.category}) - \$${expense.amount}",
+        );
+      }
+      return buffer.toString();
+    } catch (e) {
+      print("Error fetching expenses for context: $e");
+      return "Could not retrieve expense history.";
+    }
   }
 
   @override
@@ -138,8 +176,12 @@ class ChatRepositoryImpl implements ChatRepository {
       _isFirstMessage = false;
     }
 
+    // Add expense context
+    final expenseContext = await _getExpenseContext();
+    buffer.write("Context:\n$expenseContext\n\n");
+
     if (context != null) {
-      buffer.write("Context: $context\n\n");
+      buffer.write("Additional Context: $context\n\n");
     }
 
     buffer.write(prompt);

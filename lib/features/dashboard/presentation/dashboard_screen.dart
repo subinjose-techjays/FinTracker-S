@@ -1,8 +1,8 @@
 import 'package:fin_tracker/core/routes/app_routes.dart';
 import 'package:fin_tracker/core/theme/app_colors.dart';
 import 'package:fin_tracker/features/dashboard/di/dashboard_provider.dart';
-import 'package:fin_tracker/features/expense/presentation/add_expense_screen.dart';
-import 'package:fin_tracker/features/expense/presentation/expense_list_screen.dart';
+import 'package:fin_tracker/features/expense/presentation/screens/add_expense_screen.dart';
+import 'package:fin_tracker/features/expense/presentation/screens/expense_list_screen.dart';
 import 'package:fin_tracker/features/profile/presentation/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

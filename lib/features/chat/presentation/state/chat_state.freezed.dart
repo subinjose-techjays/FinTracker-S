@@ -223,7 +223,7 @@ return $default(_that.status,_that.messages,_that.downloadProgress,_that.isGener
 
 
 class _ChatState extends ChatState {
-  const _ChatState({this.status = ChatStatus.initial, final  List<ChatMessage> messages = const [], this.downloadProgress = 0.0, this.isGenerating = false, this.errorMessage, this.oneShotEvent}): _messages = messages,super._();
+  const _ChatState({this.status = ChatStatus.loading, final  List<ChatMessage> messages = const [], this.downloadProgress = 0.0, this.isGenerating = false, this.errorMessage, this.oneShotEvent}): _messages = messages,super._();
   
 
 @override@JsonKey() final  ChatStatus status;

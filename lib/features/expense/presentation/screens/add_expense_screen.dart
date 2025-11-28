@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../di/expense_module.dart';
 import '../event/expense_event.dart';
+import '../event/expense_effect.dart';
 
 class AddExpenseScreen extends ConsumerStatefulWidget {
   const AddExpenseScreen({super.key});
@@ -40,6 +40,44 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Listen for side effects
+    ref.read(expenseViewModelProvider.notifier).effectStream.listen((effect) {
+      if (!mounted) return;
+      switch (effect) {
+        case ExpenseAddedEffect():
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Expense added successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _clearFields();
+        case ShowErrorEffect():
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(effect.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        case ExpenseDeletedEffect():
+          // Not handled here
+          break;
+      }
+    });
+  }
+
+  void _clearFields() {
+    _titleController.clear();
+    _amountController.clear();
+    _categoryController.clear();
+    setState(() {
+      _selectedDate = DateTime.now();
+    });
+  }
+
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final title = _titleController.text;
@@ -56,7 +94,7 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
               category: category,
             ),
           );
-      context.pop();
+      // Removed context.pop() to keep user on screen
     }
   }
 

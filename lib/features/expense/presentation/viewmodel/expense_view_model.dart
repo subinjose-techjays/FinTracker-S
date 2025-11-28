@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entity/expense_entity.dart';
@@ -5,6 +6,7 @@ import '../../domain/usecase/add_expense_usecase.dart';
 import '../../domain/usecase/delete_expense_usecase.dart';
 import '../../domain/usecase/get_expenses_usecase.dart';
 import '../event/expense_event.dart';
+import '../event/expense_effect.dart';
 
 // State class for ExpenseViewModel
 class ExpenseState {
@@ -31,6 +33,9 @@ class ExpenseViewModel extends StateNotifier<ExpenseState> {
   final GetExpensesUseCase _getExpensesUseCase;
   final AddExpenseUseCase _addExpenseUseCase;
   final DeleteExpenseUseCase _deleteExpenseUseCase;
+
+  final _effectController = StreamController<ExpenseEffect>.broadcast();
+  Stream<ExpenseEffect> get effectStream => _effectController.stream;
 
   ExpenseViewModel({
     required GetExpensesUseCase getExpensesUseCase,
@@ -68,6 +73,7 @@ class ExpenseViewModel extends StateNotifier<ExpenseState> {
       state = state.copyWith(expenses: expenses, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      _effectController.add(ShowErrorEffect(e.toString()));
     }
   }
 
@@ -88,8 +94,10 @@ class ExpenseViewModel extends StateNotifier<ExpenseState> {
       );
       await _addExpenseUseCase(expense);
       await _loadExpenses();
+      _effectController.add(ExpenseAddedEffect());
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      _effectController.add(ShowErrorEffect(e.toString()));
     }
   }
 
@@ -98,8 +106,16 @@ class ExpenseViewModel extends StateNotifier<ExpenseState> {
     try {
       await _deleteExpenseUseCase(id);
       await _loadExpenses();
+      _effectController.add(ExpenseDeletedEffect());
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      _effectController.add(ShowErrorEffect(e.toString()));
     }
+  }
+
+  @override
+  void dispose() {
+    _effectController.close();
+    super.dispose();
   }
 }
