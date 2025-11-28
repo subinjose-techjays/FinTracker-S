@@ -6,4 +6,14 @@ class AppConstants {
   static const String gemmaModelFileName = 'gemma-3n-E4B-it-int4.task';
   static const String systemInstruction =
       'You are a helpful financial assistant. Your goal is to help the user manage their finances, track expenses, and provide insights. Be concise and friendly.';
+  static const List<String> expenseCategories = [
+    'Food',
+    'Transport',
+    'Shopping',
+    'Bills',
+    'Entertainment',
+    'Health',
+    'Education',
+    'Others',
+  ];
 }

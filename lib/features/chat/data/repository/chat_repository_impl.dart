@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import '../../domain/repository/chat_repository.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../expense/domain/entity/expense_entity.dart';
 import '../../../expense/domain/usecase/get_expenses_usecase.dart';
 import '../extensions/file_extensions.dart';
 
@@ -139,14 +141,8 @@ class ChatRepositoryImpl implements ChatRepository {
         return "User has no recorded expenses.";
       }
 
-      final buffer = StringBuffer();
-      buffer.writeln("User's Expense History:");
-      for (final expense in expenses) {
-        buffer.writeln(
-          "- ${expense.date.toLocal().toString().split(' ')[0]}: ${expense.title} (${expense.category}) - \$${expense.amount}",
-        );
-      }
-      return buffer.toString();
+      // Run heavy formatting in an isolate
+      return await compute(_formatExpenseContext, expenses);
     } catch (e) {
       print("Error fetching expenses for context: $e");
       return "Could not retrieve expense history.";
@@ -208,4 +204,16 @@ class ChatRepositoryImpl implements ChatRepository {
     }
     return buffer.toString();
   }
+}
+
+/// Top-level function for Isolate execution
+String _formatExpenseContext(List<ExpenseEntity> expenses) {
+  final buffer = StringBuffer();
+  buffer.writeln("User's Expense History:");
+  for (final expense in expenses) {
+    buffer.writeln(
+      "- ${expense.date.toLocal().toString().split(' ')[0]}: ${expense.title} (${expense.category}) - \$${expense.amount}",
+    );
+  }
+  return buffer.toString();
 }

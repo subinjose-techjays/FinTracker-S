@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 import 'package:tar/tar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -41,29 +42,35 @@ extension FileExtensions on File {
 
   /// Extracts the Gemma model from a tar.gz archive.
   /// Returns true if the model file was found and extracted.
+  /// Extracts the Gemma model from a tar.gz archive.
+  /// Returns true if the model file was found and extracted.
   Future<bool> extractGemmaModel(String targetDir, String modelFileName) async {
-    // Open the file as a stream of bytes
-    final fileStream = openRead();
-    // Decompress using GZip
-    final decompressedStream = fileStream.transform(gzip.decoder);
-    // Read tar entries
-    final reader = TarReader(decompressedStream);
+    final archivePath = path;
+    return await Isolate.run(() async {
+      final file = File(archivePath);
+      // Open the file as a stream of bytes
+      final fileStream = file.openRead();
+      // Decompress using GZip
+      final decompressedStream = fileStream.transform(gzip.decoder);
+      // Read tar entries
+      final reader = TarReader(decompressedStream);
 
-    bool found = false;
-    try {
-      while (await reader.moveNext()) {
-        final entry = reader.current;
-        if (entry.type == TypeFlag.reg && entry.name.endsWith('.task')) {
-          final taskFile = File('$targetDir/$modelFileName');
-          // Pipe the entry content stream directly to the file
-          await entry.contents.pipe(taskFile.openWrite());
-          found = true;
-          break; // Stop after finding the model
+      bool found = false;
+      try {
+        while (await reader.moveNext()) {
+          final entry = reader.current;
+          if (entry.type == TypeFlag.reg && entry.name.endsWith('.task')) {
+            final taskFile = File('$targetDir/$modelFileName');
+            // Pipe the entry content stream directly to the file
+            await entry.contents.pipe(taskFile.openWrite());
+            found = true;
+            break; // Stop after finding the model
+          }
         }
+      } finally {
+        await reader.cancel();
       }
-    } finally {
-      await reader.cancel();
-    }
-    return found;
+      return found;
+    });
   }
 }
