@@ -44,6 +44,11 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
 
+    # Exclude arm64 for simulator to fix TFLite issues on Apple Silicon
+    target.build_configurations.each do |config|
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    end
+
     # MediaPipe specific configurations
     if target.name.include?('mediapipe') || target.name.include?('genai')
       target.build_configurations.each do |config|
@@ -65,5 +70,10 @@ post_install do |installer|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       end
     end
+  end
+
+  # Also apply to the project configurations
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
   end
 end

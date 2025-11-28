@@ -27,8 +27,8 @@ class ChatRepositoryImpl implements ChatRepository {
 
     if (await File(modelPath).exists()) {
       try {
-        // Clear XNNPACK cache to prevent "Cannot reserve space" crash on Android
-        await File(modelPath).clearXnnpackCache(_modelFileName);
+        // Clear model cache to prevent "Cannot reserve space" crash on Android
+        await File(modelPath).clearModelCache(_modelFileName);
 
         // Initialize FlutterGemma with the local model file
         await FlutterGemma.installModel(
