@@ -3,8 +3,8 @@ import 'package:tar/tar.dart';
 import 'package:path_provider/path_provider.dart';
 
 extension FileExtensions on File {
-  /// Clears the XNNPACK cache associated with this file on Android.
-  /// This helps prevent "Cannot reserve space" crashes.
+  /// Clears the XNNPACK cache and other TFLite artifacts associated with this file on Android.
+  /// This helps prevent "Cannot reserve space" crashes and "File not found" errors for cache files.
   Future<void> clearXnnpackCache(String modelFileName) async {
     if (!Platform.isAndroid) return;
 
@@ -17,14 +17,28 @@ extension FileExtensions on File {
 
       // Check in Cache directory (where logs indicate it is)
       final tempDir = await getTemporaryDirectory();
+
+      // Clear .xnnpack_cache
       final tempCacheFile = File(
         '${tempDir.path}/$modelFileName.xnnpack_cache',
       );
       if (await tempCacheFile.exists()) {
         await tempCacheFile.delete();
       }
+
+      // Clear .bin cache files (e.g. gemma-3n-E4B-it-int4.task_15218672120674176464.bin)
+      // These appear to be TFLite/MediaPipe cache files that can cause issues if missing/corrupt
+      final tempDirList = tempDir.listSync();
+      for (var entity in tempDirList) {
+        if (entity is File &&
+            entity.path.contains(modelFileName) &&
+            entity.path.endsWith('.bin')) {
+          await entity.delete();
+          print('Deleted TFLite cache file: ${entity.path}');
+        }
+      }
     } catch (e) {
-      print('Error clearing XNNPACK cache: $e');
+      print('Error clearing TFLite/XNNPACK cache: $e');
     }
   }
 

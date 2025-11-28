@@ -24,9 +24,26 @@ class ChatRepositoryImpl implements ChatRepository {
   Future<void> initialize() async {
     final dir = await getApplicationDocumentsDirectory();
     final modelPath = '${dir.path}/$_modelFileName';
+    final modelFile = File(modelPath);
 
-    if (await File(modelPath).exists()) {
+    if (await modelFile.exists()) {
       try {
+        // Validate file size (Gemma models are typically > 1GB)
+        // If it's extremely small (e.g. < 100MB), it's likely a corrupt download or HTML error page
+        final fileSize = await modelFile.length();
+        print(
+          'Found Gemma model file. Size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB',
+        );
+
+        if (fileSize < 100 * 1024 * 1024) {
+          // 100 MB limit
+          print('Model file is too small, deleting corrupted file...');
+          await modelFile.delete();
+          throw Exception(
+            'Model file is corrupted (too small). Please download it again.',
+          );
+        }
+
         // Clear XNNPACK cache to prevent "Cannot reserve space" crash on Android
         await File(modelPath).clearXnnpackCache(_modelFileName);
 
@@ -45,6 +62,7 @@ class ChatRepositoryImpl implements ChatRepository {
         print('Gemma model initialized successfully at $modelPath');
       } catch (e) {
         print('Failed to initialize Gemma engine: $e');
+        // If it was a native crash (which we can't catch in Dart, but if we get here), rethrow
         throw Exception('Failed to initialize AI engine. Error: $e');
       }
     } else {
