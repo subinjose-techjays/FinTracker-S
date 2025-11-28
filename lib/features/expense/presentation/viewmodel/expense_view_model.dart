@@ -4,6 +4,7 @@ import '../../domain/entity/expense_entity.dart';
 import '../../domain/usecase/add_expense_usecase.dart';
 import '../../domain/usecase/delete_expense_usecase.dart';
 import '../../domain/usecase/get_expenses_usecase.dart';
+import '../event/expense_event.dart';
 
 // State class for ExpenseViewModel
 class ExpenseState {
@@ -39,10 +40,26 @@ class ExpenseViewModel extends StateNotifier<ExpenseState> {
        _addExpenseUseCase = addExpenseUseCase,
        _deleteExpenseUseCase = deleteExpenseUseCase,
        super(ExpenseState()) {
-    loadExpenses();
+    _loadExpenses();
   }
 
-  Future<void> loadExpenses() async {
+  void onEvent(ExpenseEvent event) {
+    switch (event) {
+      case LoadExpensesEvent():
+        _loadExpenses();
+      case AddExpenseEvent():
+        _addExpense(
+          title: event.title,
+          amount: event.amount,
+          date: event.date,
+          category: event.category,
+        );
+      case DeleteExpenseEvent():
+        _deleteExpense(event.id);
+    }
+  }
+
+  Future<void> _loadExpenses() async {
     state = state.copyWith(isLoading: true);
     try {
       final expenses = await _getExpensesUseCase();
@@ -54,7 +71,7 @@ class ExpenseViewModel extends StateNotifier<ExpenseState> {
     }
   }
 
-  Future<void> addExpense({
+  Future<void> _addExpense({
     required String title,
     required double amount,
     required DateTime date,
@@ -70,17 +87,17 @@ class ExpenseViewModel extends StateNotifier<ExpenseState> {
         category: category,
       );
       await _addExpenseUseCase(expense);
-      await loadExpenses();
+      await _loadExpenses();
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
-  Future<void> deleteExpense(String id) async {
+  Future<void> _deleteExpense(String id) async {
     state = state.copyWith(isLoading: true);
     try {
       await _deleteExpenseUseCase(id);
-      await loadExpenses();
+      await _loadExpenses();
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }

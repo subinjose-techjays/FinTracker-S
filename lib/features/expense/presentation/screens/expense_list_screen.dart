@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
 
 import '../../di/expense_module.dart';
+import '../event/expense_event.dart';
 
 class ExpenseListScreen extends ConsumerWidget {
   const ExpenseListScreen({super.key});
@@ -44,7 +45,7 @@ class ExpenseListScreen extends ConsumerWidget {
                         onPressed: () {
                           ref
                               .read(expenseViewModelProvider.notifier)
-                              .deleteExpense(expense.id);
+                              .onEvent(DeleteExpenseEvent(expense.id));
                         },
                       ),
                     ],
