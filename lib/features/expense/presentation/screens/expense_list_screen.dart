@@ -54,6 +54,7 @@ class ExpenseListScreen extends ConsumerWidget {
               },
             ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'expense_list_fab',
         onPressed: () {
           context.push(AppRoutes.addExpensePath);
         },

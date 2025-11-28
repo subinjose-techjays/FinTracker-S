@@ -16,7 +16,6 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   final _categoryController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
 
   @override
   void dispose() {
@@ -26,17 +25,15 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(BuildContext context, DateTime currentDate) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: currentDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
+    if (picked != null && picked != currentDate) {
+      ref.read(addExpenseFormViewModelProvider.notifier).updateDate(picked);
     }
   }
 
@@ -73,12 +70,10 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     _titleController.clear();
     _amountController.clear();
     _categoryController.clear();
-    setState(() {
-      _selectedDate = DateTime.now();
-    });
+    ref.read(addExpenseFormViewModelProvider.notifier).resetForm();
   }
 
-  void _submit() {
+  void _submit(DateTime selectedDate) {
     if (_formKey.currentState!.validate()) {
       final title = _titleController.text;
       final amount = double.parse(_amountController.text);
@@ -90,7 +85,7 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
             AddExpenseEvent(
               title: title,
               amount: amount,
-              date: _selectedDate,
+              date: selectedDate,
               category: category,
             ),
           );
@@ -100,6 +95,9 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final formState = ref.watch(addExpenseFormViewModelProvider);
+    final selectedDate = formState.selectedDate;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Add Expense')),
       body: Container(
@@ -185,19 +183,19 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                 Row(
                   children: [
                     Text(
-                      'Date: ${_selectedDate.toLocal().toString().split(' ')[0]}',
+                      'Date: ${selectedDate.toLocal().toString().split(' ')[0]}',
                       style: const TextStyle(color: Colors.black),
                     ),
                     const Spacer(),
                     TextButton(
-                      onPressed: () => _selectDate(context),
+                      onPressed: () => _selectDate(context, selectedDate),
                       child: const Text('Select Date'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _submit,
+                  onPressed: () => _submit(selectedDate),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,

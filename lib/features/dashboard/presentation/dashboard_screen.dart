@@ -24,6 +24,7 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       body: IndexedStack(index: selectedIndex, children: _pages),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'dashboard_fab',
         onPressed: () => context.push(AppRoutes.chatPath),
         backgroundColor: AppColors.deepGreen,
         child: const Icon(Icons.chat, color: AppColors.white),

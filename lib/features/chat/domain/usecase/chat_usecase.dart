@@ -27,6 +27,10 @@ class ChatUseCase {
     return _repository.generateResponse(prompt, context: context);
   }
 
+  Future<String> sendMessageBatch(String prompt, {String? context}) {
+    return _repository.generateResponseBatch(prompt, context: context);
+  }
+
   void resetSession() {
     _repository.resetSession();
   }

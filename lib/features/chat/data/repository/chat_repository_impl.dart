@@ -198,4 +198,14 @@ class ChatRepositoryImpl implements ChatRepository {
 
     yield* stream;
   }
+
+  @override
+  Future<String> generateResponseBatch(String prompt, {String? context}) async {
+    final stream = generateResponse(prompt, context: context);
+    final buffer = StringBuffer();
+    await for (final chunk in stream) {
+      buffer.write(chunk);
+    }
+    return buffer.toString();
+  }
 }

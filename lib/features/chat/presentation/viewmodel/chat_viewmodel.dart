@@ -129,72 +129,92 @@ class ChatViewModel extends StateNotifier<ChatState> {
     );
 
     try {
-      final responseStream = _chatUseCase.sendMessage(text, context: context);
-      String fullResponse = "";
+      // Use Batch Mode if configured (currently hardcoded to false, can be toggled via settings)
+      bool useBatchMode = false;
 
-      // Add placeholder bot message
-      // state = state.copyWith(
-      //   messages: [
-      //     ...currentMessages,
-      //     userMessage,
-      //     ChatMessage(
-      //       text: AppStrings.botPlaceholder,
-      //       isUser: false,
-      //       timestamp: DateTime.now(),
-      //     ),
-      //   ],
-      _responseSubscription?.cancel();
-      _responseSubscription = responseStream.listen(
-        (chunk) {
-          fullResponse += chunk;
-          // Update the last message with new content
-          // If it's the first chunk, add a new message. Otherwise update the last one.
-          // Since we removed the placeholder, we need to handle the first chunk differently.
+      if (useBatchMode) {
+        final response = await _chatUseCase.sendMessageBatch(
+          text,
+          context: context,
+        );
+        state = state.copyWith(
+          messages: [
+            ...currentMessages,
+            userMessage,
+            ChatMessage(
+              text: response,
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          ],
+          isGenerating: false,
+        );
+      } else {
+        // Streaming Mode with Throttling
+        final responseStream = _chatUseCase.sendMessage(text, context: context);
+        final responseBuffer = StringBuffer();
 
-          List<ChatMessage> updatedMessages;
-          if (fullResponse.length == chunk.length) {
-            updatedMessages = List<ChatMessage>.from(currentMessages)
-              ..add(userMessage)
-              ..add(
-                ChatMessage(
-                  text: fullResponse,
-                  isUser: false,
-                  timestamp: DateTime.now(),
-                ),
-              );
-          } else {
-            updatedMessages = List<ChatMessage>.from(currentMessages)
-              ..add(userMessage)
-              ..add(
-                ChatMessage(
-                  text: fullResponse,
-                  isUser: false,
-                  timestamp: DateTime.now(),
-                ),
-              );
-            // Actually, since we are rebuilding the list from currentMessages + userMessage + botMessage every time,
-            // the logic is the same. We just need to make sure we don't duplicate the bot message if we were appending.
-            // But here we are reconstructing the whole list ending with the bot message.
-            // So the previous logic works fine, it just replaces the "placeholder" (which we didn't add to state) with the real message.
-          }
+        // Add initial bot message
+        state = state.copyWith(
+          messages: [
+            ...currentMessages,
+            userMessage,
+            ChatMessage(text: "", isUser: false, timestamp: DateTime.now()),
+          ],
+        );
 
-          state = state.copyWith(messages: updatedMessages);
-        },
-        onDone: () {
-          state = state.copyWith(isGenerating: false);
-        },
-        onError: (e) {
-          state = state.copyWith(
-            isGenerating: false,
-            oneShotEvent: ChatEffect.showError(e.toString()),
-          );
-        },
-      );
+        _responseSubscription?.cancel();
+
+        // Throttling logic
+        DateTime lastUpdateTime = DateTime.now();
+        const throttleDuration = Duration(
+          milliseconds: 100,
+        ); // Update UI every 100ms
+
+        _responseSubscription = responseStream.listen(
+          (chunk) {
+            responseBuffer.write(chunk);
+
+            final now = DateTime.now();
+            if (now.difference(lastUpdateTime) >= throttleDuration) {
+              _updateBotMessage(responseBuffer.toString());
+              lastUpdateTime = now;
+            }
+          },
+          onDone: () {
+            // Ensure final update
+            _updateBotMessage(responseBuffer.toString());
+            state = state.copyWith(isGenerating: false);
+          },
+          onError: (e) {
+            state = state.copyWith(
+              isGenerating: false,
+              oneShotEvent: ChatEffect.showError(e.toString()),
+            );
+          },
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isGenerating: false,
         oneShotEvent: ChatEffect.showError(e.toString()),
       );
+    }
+  }
+
+  void _updateBotMessage(String text) {
+    if (state.messages.isEmpty) return;
+
+    final updatedMessages = List<ChatMessage>.from(state.messages);
+    final lastMessage = updatedMessages.last;
+
+    if (!lastMessage.isUser) {
+      updatedMessages.last = ChatMessage(
+        text: text,
+        isUser: false,
+        timestamp: lastMessage.timestamp,
+      );
+      state = state.copyWith(messages: updatedMessages);
     }
   }
 

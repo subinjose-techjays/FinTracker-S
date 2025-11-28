@@ -7,6 +7,7 @@ import '../domain/usecase/add_expense_usecase.dart';
 import '../domain/usecase/delete_expense_usecase.dart';
 import '../domain/usecase/get_expenses_usecase.dart';
 import '../presentation/viewmodel/expense_view_model.dart';
+import '../presentation/viewmodel/add_expense_form_view_model.dart';
 
 final expenseBoxProvider = Provider<Box<ExpenseModel>>((ref) {
   return Hive.box<ExpenseModel>('expenses');
@@ -39,4 +40,12 @@ final expenseViewModelProvider =
         addExpenseUseCase: ref.watch(addExpenseUseCaseProvider),
         deleteExpenseUseCase: ref.watch(deleteExpenseUseCaseProvider),
       );
+    });
+
+final addExpenseFormViewModelProvider =
+    StateNotifierProvider.autoDispose<
+      AddExpenseFormViewModel,
+      AddExpenseFormState
+    >((ref) {
+      return AddExpenseFormViewModel();
     });

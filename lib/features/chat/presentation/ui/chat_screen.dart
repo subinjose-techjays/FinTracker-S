@@ -52,9 +52,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       if (effect != null) {
         effect.when(
           showError: (message) {
+            final displayText = message.length > 200
+                ? message.substring(0, 200)
+                : message;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(message.substring(0, 200)),
+                content: Text(displayText),
                 backgroundColor: Colors.yellow,
               ),
             );
@@ -101,7 +104,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _buildChat(ChatState state) {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    // Only scroll if new messages added (simple check, can be improved)
+    if (state.messages.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    }
     return Column(
       children: [
         Expanded(
@@ -124,12 +130,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           controller: _controller,
           isGenerating: state.isGenerating,
           onSend: (text) {
-            ref.read(chatViewModelProvider.notifier)
+            ref
+                .read(chatViewModelProvider.notifier)
                 .onEvent(ChatEvent.sendMessage(text));
             _controller.clear();
           },
           onStop: () {
-            ref.read(chatViewModelProvider.notifier)
+            ref
+                .read(chatViewModelProvider.notifier)
                 .onEvent(const ChatEvent.stopGeneration());
           },
         ),
