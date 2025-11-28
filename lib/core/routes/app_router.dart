@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:fin_tracker/features/login/presentation/screen/login_screen.dart';
 import 'package:fin_tracker/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:fin_tracker/features/chat/presentation/ui/chat_screen.dart';
+import '../../features/expense/presentation/screens/expense_list_screen.dart';
+import '../../features/expense/presentation/screens/add_expense_screen.dart';
 import 'app_routes.dart';
 
 final appRouter = GoRouter(
@@ -44,6 +46,16 @@ final appRouter = GoRouter(
       path: AppRoutes.chatPath,
       name: AppRoutes.chatName,
       builder: (context, state) => const ChatScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.expenseListPath,
+      name: AppRoutes.expenseListName,
+      builder: (context, state) => const ExpenseListScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.addExpensePath,
+      name: AppRoutes.addExpenseName,
+      builder: (context, state) => const AddExpenseScreen(),
     ),
   ],
 );

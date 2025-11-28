@@ -4,11 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'features/expense/data/model/expense_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FlutterGemma.initialize();
+  await Hive.initFlutter();
+  Hive.registerAdapter(ExpenseModelAdapter());
+  await Hive.openBox<ExpenseModel>('expenses');
   runApp(ProviderScope(child: FinTrackerApp()));
 }
 
